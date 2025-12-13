@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.tinread_rfid_scanner"
+    namespace = "com.imeromania.tinread_rfid_scanner"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.tinread_rfid_scanner"
+        applicationId = "com.imeromania.tinread_rfid_scanner"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

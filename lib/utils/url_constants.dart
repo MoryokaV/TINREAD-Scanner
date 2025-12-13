@@ -6,10 +6,7 @@ String getCoverUrl(String baseUrl, int id) => "$baseUrl/covers.svc?h=190&t=m&w=1
 
 void openBrowserURL(Uri url) async {
   if (await canLaunchUrl(url)) {
-    launchUrl(
-      url,
-      mode: LaunchMode.externalApplication,
-    );
+    launchUrl(url, mode: LaunchMode.externalApplication);
   } else {
     throw "Could not launch $url";
   }
