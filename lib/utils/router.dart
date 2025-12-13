@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tinread_rfid_scanner/views/login_view.dart';
 
 class Routes {
   Routes._();
@@ -15,7 +16,7 @@ class PageRouter {
       case Routes.home:
         return adaptivePageRoute(builder: (context) => const Scaffold());
       case Routes.login:
-        return adaptivePageRoute(builder: (context) => Scaffold());
+        return adaptivePageRoute(builder: (context) => LoginView());
       default:
         return null;
     }

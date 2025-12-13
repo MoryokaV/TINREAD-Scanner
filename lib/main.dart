@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:tinread_rfid_scanner/utils/navigation_util.dart';
+import 'package:tinread_rfid_scanner/utils/responsive.dart';
 import 'package:tinread_rfid_scanner/utils/router.dart';
 import 'package:tinread_rfid_scanner/utils/style.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  Responsive.init();
+
   runApp(const MyApp());
 }
 
@@ -14,7 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'TINREAD RFID Scanner',
-      initialRoute: Routes.home,
+      initialRoute: Routes.login,
       navigatorKey: NavigationUtil.navigatorKey,
       onGenerateRoute: PageRouter.generateRoute,
       // localizationsDelegates: AppLocalizations.localizationsDelegates,
