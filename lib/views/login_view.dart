@@ -96,7 +96,7 @@ class _LoginViewState extends State<LoginView> {
                       UsernameField(
                         controller: usernameFieldController,
                         // hintText: AppLocalizations.of(context).usernameInputHint,
-                        hintText: "ionpop65",
+                        hintText: "ionpopescu86",
                       ),
                       SizedBox(height: 12),
                       Text(
@@ -106,23 +106,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       SizedBox(height: 6),
                       PasswordField(controller: passwordFieldController, hintText: "•••••••••••"),
-                      SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: loginUser,
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: Text(
-                            // AppLocalizations.of(context).signIn,
-                            "Autentificare",
-                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ),
+
                       SizedBox(height: 24),
                       Row(
                         spacing: 10,
@@ -141,8 +125,25 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 36),
-                      Center(child: Image.asset("assets/images/tinread_tiny.png", width: Responsive.screenWidth / 3)),
+                      SizedBox(height: Responsive.safeBlockVertical * 6),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: loginUser,
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Text(
+                            // AppLocalizations.of(context).signIn,
+                            "Autentificare",
+                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: Responsive.safeBlockVertical * 4),
+                      Center(child: Image.asset("assets/images/ime.png", width: Responsive.screenWidth / 3)),
                       SizedBox(height: Responsive.safePaddingBottom + 24),
                     ],
                   ),
