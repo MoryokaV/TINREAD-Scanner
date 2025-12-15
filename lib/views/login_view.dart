@@ -17,6 +17,7 @@ class _LoginViewState extends State<LoginView> {
 
   final usernameFieldController = TextEditingController();
   final passwordFieldController = TextEditingController();
+  final serverFieldController = TextEditingController();
 
   bool rememberMe = true;
 
@@ -42,7 +43,7 @@ class _LoginViewState extends State<LoginView> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        backgroundColor: kBackgroundColor,
+        backgroundColor: Colors.white,
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
@@ -84,9 +85,10 @@ class _LoginViewState extends State<LoginView> {
                       Text(
                         "Autentificare",
                         // AppLocalizations.of(context).signIn,
-                        style: Theme.of(context).textTheme.headlineLarge!.copyWith(fontSize: 24),
+                        style: Theme.of(context).textTheme.headlineLarge!.copyWith(fontSize: 26),
                       ),
                       SizedBox(height: 36),
+
                       Text(
                         "Utilizator",
                         // AppLocalizations.of(context).username,
@@ -98,14 +100,28 @@ class _LoginViewState extends State<LoginView> {
                         // hintText: AppLocalizations.of(context).usernameInputHint,
                         hintText: "ionpopescu86",
                       ),
+
                       SizedBox(height: 12),
+
                       Text(
                         // AppLocalizations.of(context).password,
                         "Parolă",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       SizedBox(height: 6),
-                      PasswordField(controller: passwordFieldController, hintText: "•••••••••••"),
+                      PasswordField(
+                        controller: passwordFieldController,
+                        hintText: "•••••••••••",
+                      ),
+
+                      SizedBox(height: 12),
+
+                      Text("Server URL", style: Theme.of(context).textTheme.headlineSmall),
+                      SizedBox(height: 6),
+                      ServerField(
+                        controller: serverFieldController,
+                        hintText: "https://example.com/",
+                      ),
 
                       SizedBox(height: 24),
                       Row(
@@ -125,7 +141,7 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         ],
                       ),
-                      SizedBox(height: Responsive.safeBlockVertical * 6),
+                      SizedBox(height: Responsive.safeBlockVertical * 4),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -142,9 +158,8 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         ),
                       ),
-                      SizedBox(height: Responsive.safeBlockVertical * 4),
-                      Center(child: Image.asset("assets/images/ime.png", width: Responsive.screenWidth / 3)),
-                      SizedBox(height: Responsive.safePaddingBottom + 24),
+                      SizedBox(height: Responsive.safeBlockVertical * 2),
+                      Center(child: Image.asset("assets/images/ime_android12.png", width: Responsive.screenWidth / 3)),
                     ],
                   ),
                 ),
@@ -268,6 +283,60 @@ class _PasswordFieldState extends State<PasswordField> {
         isDense: true,
         hintText: hintText,
         prefixIcon: Icon(FontAwesomeIcons.lock, size: 20),
+        prefixIconColor: focusNode.hasFocus ? kPrimaryColor : kDisabledIconColor,
+      ),
+      onSubmitted: (_) {},
+      onEditingComplete: () {},
+    );
+  }
+}
+
+class ServerField extends StatefulWidget {
+  final String hintText;
+  final TextEditingController controller;
+
+  const ServerField({required this.hintText, required this.controller, super.key});
+
+  @override
+  State<ServerField> createState() => _ServerFieldState();
+}
+
+class _ServerFieldState extends State<ServerField> {
+  FocusNode focusNode = FocusNode();
+  late String hintText;
+
+  @override
+  void initState() {
+    super.initState();
+
+    hintText = widget.hintText;
+
+    focusNode.addListener(() {
+      hintText = focusNode.hasFocus ? "" : widget.hintText;
+
+      setState(() {});
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      autocorrect: false,
+      focusNode: focusNode,
+      controller: widget.controller,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.all(16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: kPrimaryColor, width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: lightGrey, width: 1),
+        ),
+        isDense: true,
+        hintText: hintText,
+        prefixIcon: Icon(FontAwesomeIcons.globe, size: 20),
         prefixIconColor: focusNode.hasFocus ? kPrimaryColor : kDisabledIconColor,
       ),
       onSubmitted: (_) {},
