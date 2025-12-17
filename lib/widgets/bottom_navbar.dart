@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
@@ -44,6 +43,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
           splashFactory: NoSplash.splashFactory,
         ),
         child: BottomNavigationBar(
+          backgroundColor: Colors.white,
           elevation: 10,
           unselectedFontSize: 14,
           selectedFontSize: 16,
