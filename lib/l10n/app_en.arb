@@ -13,5 +13,17 @@
   "unauthDialogHeading": "Sign in",
   "unauthDialogContent": "Sorry, your username or password is incorrect. Please try again.",
   "home": "Home",
-  "settings": "Settings"
+  "settings": "Settings",
+  "requiredField": "This field is required",
+  "@requiredField": {
+    "description": "Required text form field error label"
+  },
+  "requiredUrlField": "Please enter a URL",
+  "@requiredUrlField": {
+    "description": "Required text form field error url label"
+  },
+  "invalidTINREADServer": "Invalid TINREAD server. Try again!",
+  "@invalidTINREADServer": {
+    "description": "Error popup body text"
+  }
 }

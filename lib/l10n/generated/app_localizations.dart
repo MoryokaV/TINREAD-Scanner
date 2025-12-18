@@ -163,6 +163,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get settings;
+
+  /// Required text form field error label
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get requiredField;
+
+  /// Required text form field error url label
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a URL'**
+  String get requiredUrlField;
+
+  /// Error popup body text
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid TINREAD server. Try again!'**
+  String get invalidTINREADServer;
 }
 
 class _AppLocalizationsDelegate

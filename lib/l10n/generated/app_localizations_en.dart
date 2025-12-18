@@ -42,4 +42,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings => 'Settings';
+
+  @override
+  String get requiredField => 'This field is required';
+
+  @override
+  String get requiredUrlField => 'Please enter a URL';
+
+  @override
+  String get invalidTINREADServer => 'Invalid TINREAD server. Try again!';
 }

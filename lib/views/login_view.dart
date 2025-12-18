@@ -43,7 +43,13 @@ class _LoginViewState extends State<LoginView> {
         // if (mounted) await Provider.of<UserProvider>(context, listen: false).setUser(authToken, rememberMe);
         if (mounted) Navigator.pushNamedAndRemoveUntil(context, Routes.home, (_) => false);
       } on SocketException catch (_) {
-        if (mounted) showInfoDialog(context, "Error", "Invalid TINREAD server.");
+        if (mounted) {
+          showInfoDialog(
+            context,
+            AppLocalizations.of(context).errorDialogHeading,
+            AppLocalizations.of(context).invalidTINREADServer,
+          );
+        }
       } on ApiException catch (exception) {
         if (mounted) showErrorDialog(context, exception);
       }
@@ -159,19 +165,29 @@ class _LoginViewState extends State<LoginView> {
                           child: ElevatedButton(
                             onPressed: loginUser,
                             style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
                               elevation: 0,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             child: Text(
                               AppLocalizations.of(context).signIn,
-                              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
                         SizedBox(height: Responsive.safeBlockVertical * 2),
                         Center(
-                          child: Image.asset("assets/images/ime_android12.png", width: Responsive.screenWidth / 3),
+                          child: Image.asset(
+                            "assets/images/ime_android12.png",
+                            width: Responsive.screenWidth / 3,
+                          ),
                         ),
                       ],
                     ),
@@ -219,7 +235,7 @@ class _UsernameFieldState extends State<UsernameField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'This field is required';
+          return AppLocalizations.of(context).requiredField;
         }
 
         return null;
@@ -272,7 +288,7 @@ class _PasswordFieldState extends State<PasswordField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'This field is required';
+          return AppLocalizations.of(context).requiredField;
         }
 
         return null;
@@ -332,7 +348,7 @@ class _ServerFieldState extends State<ServerField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter a URL';
+          return AppLocalizations.of(context).requiredUrlField;
         }
 
         if (!isValidURL(value)) {

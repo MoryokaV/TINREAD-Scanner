@@ -42,4 +42,14 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get settings => 'Setări';
+
+  @override
+  String get requiredField => 'Acest câmp este obligatoriu';
+
+  @override
+  String get requiredUrlField => 'Introdu, te rog, un URL';
+
+  @override
+  String get invalidTINREADServer =>
+      'Server TINREAD invalid. Încearcă din nou!';
 }
