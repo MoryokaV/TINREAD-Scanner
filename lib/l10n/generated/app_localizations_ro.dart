@@ -52,4 +52,16 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get invalidTINREADServer =>
       'Server TINREAD invalid. Încearcă din nou!';
+
+  @override
+  String get inventory => 'Inventariere';
+
+  @override
+  String get uploadToTINREAD => 'Încarcă în TINREAD';
+
+  @override
+  String get downloadFile => 'Descarcă fișier';
+
+  @override
+  String get reset => 'Resetează';
 }

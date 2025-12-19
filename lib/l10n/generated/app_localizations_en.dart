@@ -51,4 +51,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidTINREADServer => 'Invalid TINREAD server. Try again!';
+
+  @override
+  String get inventory => 'Inventory';
+
+  @override
+  String get uploadToTINREAD => 'Upload to TINREAD';
+
+  @override
+  String get downloadFile => 'Download file';
+
+  @override
+  String get reset => 'Reset';
 }

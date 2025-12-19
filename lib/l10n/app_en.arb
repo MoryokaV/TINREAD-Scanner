@@ -25,5 +25,9 @@
   "invalidTINREADServer": "Invalid TINREAD server. Try again!",
   "@invalidTINREADServer": {
     "description": "Error popup body text"
-  }
+  },
+  "inventory": "Inventory",
+  "uploadToTINREAD": "Upload to TINREAD",
+  "downloadFile": "Download file",
+  "reset": "Reset"
 }

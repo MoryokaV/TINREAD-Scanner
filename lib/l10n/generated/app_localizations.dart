@@ -181,6 +181,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid TINREAD server. Try again!'**
   String get invalidTINREADServer;
+
+  /// No description provided for @inventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory'**
+  String get inventory;
+
+  /// No description provided for @uploadToTINREAD.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload to TINREAD'**
+  String get uploadToTINREAD;
+
+  /// No description provided for @downloadFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Download file'**
+  String get downloadFile;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
 }
 
 class _AppLocalizationsDelegate

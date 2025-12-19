@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_rfid_scanner/utils/responsive.dart';
 import 'package:tinread_rfid_scanner/utils/style.dart';
 
@@ -26,7 +27,6 @@ class _HomeViewState extends State<HomeView> {
         height: itemSize,
         padding: EdgeInsets.all(6),
         decoration: BoxDecoration(
-          // color: Colors.white,
           color: Colors.grey[100],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -130,22 +130,22 @@ class _HomeViewState extends State<HomeView> {
                 buildMultimediaItemContainer(
                   context,
                   icon: "assets/icons/book.svg",
-                  name: "Inventariere",
+                  name: AppLocalizations.of(context).inventory,
                 ),
                 buildMultimediaItemContainer(
                   context,
                   icon: "assets/icons/upload.svg",
-                  name: "Încarcă în TINREAD",
+                  name: AppLocalizations.of(context).uploadToTINREAD,
                 ),
                 buildMultimediaItemContainer(
                   context,
                   icon: "assets/icons/download.svg",
-                  name: "Descarcă fișier",
+                  name: AppLocalizations.of(context).downloadFile,
                 ),
                 buildMultimediaItemContainer(
                   context,
                   icon: "assets/icons/eraser.svg",
-                  name: "Resetează",
+                  name: AppLocalizations.of(context).reset,
                 ),
               ],
             ),

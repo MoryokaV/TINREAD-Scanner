@@ -13,5 +13,9 @@
   "settings": "Setări",
   "requiredField": "Acest câmp este obligatoriu",
   "requiredUrlField": "Introdu, te rog, un URL",
-  "invalidTINREADServer": "Server TINREAD invalid. Încearcă din nou!"
+  "invalidTINREADServer": "Server TINREAD invalid. Încearcă din nou!",
+  "inventory": "Inventariere",
+  "uploadToTINREAD": "Încarcă în TINREAD",
+  "downloadFile": "Descarcă fișier",
+  "reset": "Resetează"
 }
