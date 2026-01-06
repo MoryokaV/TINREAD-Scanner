@@ -11,6 +11,8 @@ import 'package:tinread_rfid_scanner/utils/style.dart';
 
 late final String initialRoute;
 
+// TODO: orientation lock
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

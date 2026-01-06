@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tinread_rfid_scanner/views/inventory_view.dart';
 import 'package:tinread_rfid_scanner/views/login_view.dart';
 import 'package:tinread_rfid_scanner/widgets/bottom_navbar.dart';
 
@@ -9,6 +10,7 @@ class Routes {
 
   static const login = "/login";
   static const home = '/home';
+  static const inventory = "/inventory";
 }
 
 class PageRouter {
@@ -18,6 +20,8 @@ class PageRouter {
         return adaptivePageRoute(builder: (context) => const BottomNavbar());
       case Routes.login:
         return adaptivePageRoute(builder: (context) => LoginView());
+      case Routes.inventory:
+        return adaptivePageRoute(builder: (context) => InventoryView());
       default:
         return null;
     }

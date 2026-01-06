@@ -81,4 +81,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkForUpdates => 'Check for updates';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get errors => 'Errors';
 }

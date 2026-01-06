@@ -82,4 +82,10 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get checkForUpdates => 'Caută actualizări';
+
+  @override
+  String get all => 'Toate';
+
+  @override
+  String get errors => 'Excepții';
 }

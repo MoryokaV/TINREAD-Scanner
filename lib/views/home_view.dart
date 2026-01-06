@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_rfid_scanner/utils/responsive.dart';
+import 'package:tinread_rfid_scanner/utils/router.dart';
 import 'package:tinread_rfid_scanner/utils/style.dart';
 
 class HomeView extends StatefulWidget {
@@ -16,12 +17,13 @@ class _HomeViewState extends State<HomeView> {
     BuildContext context, {
     required String icon,
     required String name,
+    required void Function() onTap,
   }) {
     double itemSize = (Responsive.screenWidth - 49) / 2;
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: () {},
+      onTap: onTap,
       child: Ink(
         width: itemSize,
         height: itemSize,
@@ -84,27 +86,30 @@ class _HomeViewState extends State<HomeView> {
             SizedBox(height: Responsive.safeBlockVertical * 3),
             Container(
               padding: EdgeInsets.only(
-                left: 12,
-                top: 6,
-                bottom: 6,
-                right: 12,
+                left: 20,
+                top: 10,
+                bottom: 10,
+                right: 20,
               ),
               decoration: BoxDecoration(
                 color: kSuccessIconColor,
                 borderRadius: .circular(100),
               ),
               child: Row(
-                spacing: 10,
+                spacing: 12,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 15,
-                    height: 15,
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: .circular(100)),
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: .circular(100),
+                    ),
                   ),
                   RichText(
                     text: TextSpan(
-                      style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white),
+                      style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white, height: 1),
                       children: [
                         TextSpan(
                           text: "${AppLocalizations.of(context).deviceStatus}: ",
@@ -131,21 +136,27 @@ class _HomeViewState extends State<HomeView> {
                   context,
                   icon: "assets/icons/book.svg",
                   name: AppLocalizations.of(context).inventory,
+                  onTap: () {
+                    Navigator.pushNamed(context, Routes.inventory);
+                  },
                 ),
                 buildMultimediaItemContainer(
                   context,
                   icon: "assets/icons/upload.svg",
                   name: AppLocalizations.of(context).uploadToTINREAD,
+                  onTap: () {},
                 ),
                 buildMultimediaItemContainer(
                   context,
                   icon: "assets/icons/download.svg",
                   name: AppLocalizations.of(context).downloadFile,
+                  onTap: () {},
                 ),
                 buildMultimediaItemContainer(
                   context,
                   icon: "assets/icons/eraser.svg",
                   name: AppLocalizations.of(context).reset,
+                  onTap: () {},
                 ),
               ],
             ),

@@ -35,5 +35,7 @@
   "sound": "Sound",
   "about": "About",
   "privacyPolicy": "Privacy policy",
-  "checkForUpdates": "Check for updates"
+  "checkForUpdates": "Check for updates",
+  "all": "All",
+  "errors": "Errors"
 }

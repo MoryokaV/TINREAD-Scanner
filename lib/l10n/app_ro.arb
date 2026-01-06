@@ -23,5 +23,7 @@
   "sound": "Sunet",
   "about": "Despre",
   "privacyPolicy": "Politica de confidențialitate",
-  "checkForUpdates": "Caută actualizări"
+  "checkForUpdates": "Caută actualizări",
+  "all": "Toate",
+  "errors": "Excepții"
 }
