@@ -25,5 +25,10 @@
   "privacyPolicy": "Politica de confidențialitate",
   "checkForUpdates": "Caută actualizări",
   "all": "Toate",
-  "errors": "Excepții"
+  "errors": "Excepții",
+  "time": "Timp",
+  "filter": "Filtru",
+  "number_short": "Nr.",
+  "situation": "Situație",
+  "actions": "Acțiuni"
 }

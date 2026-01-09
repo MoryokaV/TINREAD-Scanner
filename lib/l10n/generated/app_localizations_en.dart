@@ -87,4 +87,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errors => 'Errors';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get number_short => 'No.';
+
+  @override
+  String get situation => 'Situation';
+
+  @override
+  String get actions => 'Actions';
 }

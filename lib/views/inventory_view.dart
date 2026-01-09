@@ -18,10 +18,6 @@ class _InventoryViewState extends State<InventoryView> {
   late List<String> filters = [];
   late String selectedFilter;
 
-  final tableCol1Width = Responsive.screenWidth / 4;
-  final tableCol2Width = Responsive.screenWidth / 2 - 12;
-  final tableCol3Width = Responsive.screenWidth / 4 - 12;
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -108,7 +104,7 @@ class _InventoryViewState extends State<InventoryView> {
                             size: 20,
                           ),
                           Text(
-                            "Timp: 01:45:32",
+                            "${AppLocalizations.of(context).time}: 01:45:32",
                             style: Theme.of(context).textTheme.labelMedium!.copyWith(color: kBlackColor),
                           ),
                         ],
@@ -119,7 +115,7 @@ class _InventoryViewState extends State<InventoryView> {
                     spacing: 12,
                     children: [
                       Text(
-                        "Filtru:",
+                        "${AppLocalizations.of(context).filter}:",
                         style: Theme.of(context).textTheme.labelLarge,
                       ),
                       DropdownButton<String>(
@@ -153,169 +149,208 @@ class _InventoryViewState extends State<InventoryView> {
                 ],
               ),
             ),
-            Expanded(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      top: 12,
-                      left: 12,
-                      right: 12,
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: tableCol1Width,
-                          child: Text("Nr."),
-                        ),
-                        SizedBox(
-                          width: tableCol2Width,
-                          child: Text("Situație"),
-                        ),
-                        SizedBox(
-                          width: tableCol3Width,
-                          child: Text("Acțiuni"),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Separator(),
-                  Expanded(
-                    child: ListView.builder(
-                      padding: .zero,
-                      itemCount: 40,
-                      shrinkWrap: true,
-                      physics: ScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Container(
-                          padding: .symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: index % 2 == 1 ? lightGrey : kBackgroundColor,
-                          ),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: tableCol1Width,
-                                child: Text("5672"),
-                              ),
-                              SizedBox(
-                                width: tableCol2Width,
-                                child: Text("În inventariere"),
-                              ),
-                              SizedBox(
-                                width: tableCol3Width,
-                                child: Row(
-                                  spacing: 6,
-                                  children: [
-                                    IconButton(
-                                      visualDensity: VisualDensity.compact,
-                                      constraints: BoxConstraints(),
-                                      splashRadius: 1,
-                                      padding: .zero,
-                                      onPressed: () {
-                                        print("delete");
-                                      },
-                                      icon: FaIcon(
-                                        FontAwesomeIcons.trashCan,
-                                        color: kPrimaryColor,
-                                        size: 18,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      visualDensity: VisualDensity.compact,
-                                      constraints: BoxConstraints(),
-                                      splashRadius: 1,
-                                      padding: .zero,
-                                      onPressed: () {
-                                        print("compass");
-                                      },
-                                      icon: FaIcon(
-                                        FontAwesomeIcons.compass,
-                                        color: kPrimaryColor,
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(
-                bottom: Responsive.safePaddingBottom > 0 ? Responsive.safePaddingBottom : 12,
-                left: 12,
-                right: 12,
-                top: 12,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [topShadow],
-              ),
-              child: Row(
-                spacing: 24,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                        color: isOnline ? kSuccessTextColor : kDangerTextColor,
-                        height: 1,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: " •  ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: isOnline ? kSuccessIconColor : kDangerIconColor,
-                            fontSize: 24,
-                          ),
-                        ),
-                        TextSpan(
-                          text: "Status: ",
-                        ),
-                        TextSpan(
-                          text: "online",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            // color: kSuccessIconColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                      ),
-                      child: Text(
-                        "Start",
-                        style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            ItemsTable(),
+            BottomActionBar(
+              isOnline: isOnline,
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ItemsTable extends StatefulWidget {
+  const ItemsTable({super.key});
+
+  @override
+  State<ItemsTable> createState() => _ItemsTableState();
+}
+
+class _ItemsTableState extends State<ItemsTable> {
+  final tableCol1Width = Responsive.screenWidth / 4;
+  final tableCol2Width = Responsive.screenWidth / 2 - 12;
+  final tableCol3Width = Responsive.screenWidth / 4 - 12;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 12,
+              left: 12,
+              right: 12,
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: tableCol1Width,
+                  child: Text(AppLocalizations.of(context).number_short),
+                ),
+                SizedBox(
+                  width: tableCol2Width,
+                  child: Text(AppLocalizations.of(context).situation),
+                ),
+                SizedBox(
+                  width: tableCol3Width,
+                  child: Text(AppLocalizations.of(context).actions),
+                ),
+              ],
+            ),
+          ),
+          Separator(),
+          Expanded(
+            child: ListView.builder(
+              padding: .zero,
+              itemCount: 40,
+              shrinkWrap: true,
+              physics: ScrollPhysics(),
+              itemBuilder: (context, index) {
+                return Container(
+                  padding: .symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: index % 2 == 1 ? lightGrey : kBackgroundColor,
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: tableCol1Width,
+                        child: Text("5672"),
+                      ),
+                      SizedBox(
+                        width: tableCol2Width,
+                        child: Text("În inventariere"),
+                      ),
+                      SizedBox(
+                        width: tableCol3Width,
+                        child: Row(
+                          spacing: 12,
+                          children: [
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              constraints: BoxConstraints(),
+                              splashRadius: 1,
+                              padding: .zero,
+                              onPressed: () {
+                                print("delete");
+                              },
+                              icon: FaIcon(
+                                FontAwesomeIcons.trashCan,
+                                color: kPrimaryColor,
+                                size: 18,
+                              ),
+                            ),
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              constraints: BoxConstraints(),
+                              splashRadius: 1,
+                              padding: .zero,
+                              onPressed: () {
+                                print("compass");
+                              },
+                              icon: FaIcon(
+                                FontAwesomeIcons.compass,
+                                color: kPrimaryColor,
+                                size: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class BottomActionBar extends StatefulWidget {
+  final bool isOnline;
+
+  const BottomActionBar({
+    super.key,
+    required this.isOnline,
+  });
+
+  @override
+  State<BottomActionBar> createState() => _BottomActionBarState();
+}
+
+class _BottomActionBarState extends State<BottomActionBar> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        bottom: Responsive.safePaddingBottom > 0 ? Responsive.safePaddingBottom : 12,
+        left: 12,
+        right: 12,
+        top: 12,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [topShadow],
+      ),
+      child: Row(
+        spacing: 24,
+        children: [
+          RichText(
+            text: TextSpan(
+              style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                color: widget.isOnline ? kSuccessTextColor : kDangerTextColor,
+                height: 1,
+              ),
+              children: [
+                TextSpan(
+                  text: " •  ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: widget.isOnline ? kSuccessIconColor : kDangerIconColor,
+                    fontSize: 24,
+                  ),
+                ),
+                TextSpan(
+                  text: "Status: ",
+                ),
+                TextSpan(
+                  text: widget.isOnline ? "online" : "offline",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    // color: kSuccessIconColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+              ),
+              child: Text(
+                "Start",
+                style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -37,5 +37,10 @@
   "privacyPolicy": "Privacy policy",
   "checkForUpdates": "Check for updates",
   "all": "All",
-  "errors": "Errors"
+  "errors": "Errors",
+  "time": "Time",
+  "filter": "Filter",
+  "number_short": "No.",
+  "situation": "Situation",
+  "actions": "Actions"
 }

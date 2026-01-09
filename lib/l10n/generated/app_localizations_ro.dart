@@ -88,4 +88,19 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get errors => 'Excepții';
+
+  @override
+  String get time => 'Timp';
+
+  @override
+  String get filter => 'Filtru';
+
+  @override
+  String get number_short => 'Nr.';
+
+  @override
+  String get situation => 'Situație';
+
+  @override
+  String get actions => 'Acțiuni';
 }

@@ -253,6 +253,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Errors'**
   String get errors;
+
+  /// No description provided for @time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @number_short.
+  ///
+  /// In en, this message translates to:
+  /// **'No.'**
+  String get number_short;
+
+  /// No description provided for @situation.
+  ///
+  /// In en, this message translates to:
+  /// **'Situation'**
+  String get situation;
+
+  /// No description provided for @actions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get actions;
 }
 
 class _AppLocalizationsDelegate
