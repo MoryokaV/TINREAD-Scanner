@@ -13,8 +13,6 @@ import 'package:tinread_rfid_scanner/utils/style.dart';
 
 late final String initialRoute;
 
-// TODO: orientation lock
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -27,7 +25,10 @@ void main() async {
   await LocalStorage.init();
 
   User? user = await LocalStorage.getUserDetails();
-  initialRoute = user == null ? Routes.login : Routes.home;
+  // initialRoute = user == null ? Routes.login : Routes.home;
+
+  // TODO: work in progres
+  initialRoute = Routes.home;
 
   runApp(
     MultiProvider(
