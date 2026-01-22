@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+import 'package:tinread_rfid_scanner/providers/settings_provider.dart';
+import 'package:tinread_rfid_scanner/services/localstorage_service.dart';
 import 'package:tinread_rfid_scanner/utils/responsive.dart';
 import 'package:tinread_rfid_scanner/utils/style.dart';
+import 'package:tinread_rfid_scanner/widgets/alert_dialog.dart';
 
 class CameraInventoryView extends StatefulWidget {
   const CameraInventoryView({super.key});
@@ -15,7 +19,7 @@ class CameraInventoryView extends StatefulWidget {
   State<CameraInventoryView> createState() => _CameraInventoryViewState();
 }
 
-class _CameraInventoryViewState extends State<CameraInventoryView> {
+class _CameraInventoryViewState extends State<CameraInventoryView> with WidgetsBindingObserver {
   bool flash = false;
 
   late final AudioPlayer audioPlayer = AudioPlayer();
@@ -23,31 +27,70 @@ class _CameraInventoryViewState extends State<CameraInventoryView> {
     cameraResolution: Size(1080, 1920),
     detectionSpeed: DetectionSpeed.normal,
     facing: CameraFacing.back,
-    detectionTimeoutMs: 500,
+    detectionTimeoutMs: 1000,
     torchEnabled: flash,
     autoStart: true,
   );
 
-  List<String> codes = [];
+  late List<String> codes;
+  int failAttempts = 0;
 
   void _handleBarcode(BarcodeCapture result) async {
     String newCode = result.barcodes.first.rawValue!;
 
     if (!codes.contains(newCode)) {
-      print(newCode);
+      failAttempts = 0;
 
       setState(() {
-        codes.add(result.barcodes.first.rawValue!);
+        codes.add(newCode);
       });
 
-      await audioPlayer.play(AssetSource("audio/beep.mp3"));
+      if (context.read<SettingsProvider>().settings.soundEnabled) {
+        await audioPlayer.play(AssetSource("audio/beep.mp3"));
+      }
+    } else {
+      failAttempts += 1;
+
+      if (failAttempts >= 4) {
+        await audioPlayer.play(AssetSource("audio/error.mp3"));
+      }
+
+      if (failAttempts >= 8) {
+        failAttempts = 0;
+
+        if (mounted) showInfoDialog(context, "Atenție", "Codul $newCode se află deja în listă");
+      }
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
+    codes = LocalStorage.getCurrentInventory() ?? [];
   }
 
   @override
   Future<void> dispose() async {
     super.dispose();
     await scannerController.dispose();
+    await LocalStorage.saveCurrentInventory(codes);
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  // save on app quit
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      await LocalStorage.saveCurrentInventory(codes);
+    }
   }
 
   Widget buildBooksNumberText() {
@@ -98,23 +141,7 @@ class _CameraInventoryViewState extends State<CameraInventoryView> {
       String fileContent = codes.join("\r\n");
       await file.writeAsString(fileContent);
 
-      if (mounted) {
-        showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: const Text('Export'),
-            content: Text('Găsești fișierul la calea:\n\n $filePath'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Ok'),
-              ),
-            ],
-          ),
-        );
-      }
+      if (mounted) showInfoDialog(context, "Export", "Găsești fișierul la calea:\n\n $filePath");
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -125,28 +152,15 @@ class _CameraInventoryViewState extends State<CameraInventoryView> {
   }
 
   void resetList() {
-    showDialog<String>(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Reset'),
-        content: const Text('Ești sigur că vrei să ștergi lista de coduri?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Anulează'),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                codes.clear();
-              });
-
-              Navigator.pop(context);
-            },
-            child: const Text('Da'),
-          ),
-        ],
-      ),
+    showConfirmDialog(
+      context,
+      title: "Reset",
+      content: 'Ești sigur că vrei să ștergi lista de coduri?',
+      onConfirm: () {
+        setState(() {
+          codes.clear();
+        });
+      },
     );
   }
 
@@ -206,6 +220,7 @@ class _CameraInventoryViewState extends State<CameraInventoryView> {
           ),
         ),
         body: SafeArea(
+          bottom: false,
           child: TabBarView(
             children: [
               Column(
@@ -220,8 +235,8 @@ class _CameraInventoryViewState extends State<CameraInventoryView> {
                   Container(
                     padding: EdgeInsets.only(
                       bottom: Responsive.safePaddingBottom > 0 ? Responsive.safePaddingBottom : 12,
-                      left: 12,
-                      right: 12,
+                      left: 24,
+                      right: 24,
                       top: 12,
                     ),
                     decoration: BoxDecoration(

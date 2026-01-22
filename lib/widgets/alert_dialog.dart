@@ -73,3 +73,42 @@ void _showAdaptiveDialog(BuildContext context, String title, String content) {
     }
   });
 }
+
+void showConfirmDialog(
+  BuildContext context, {
+  required String title,
+  required String content,
+  required Function onConfirm,
+}) {
+  Future.delayed(Duration.zero, () {
+    if (!context.mounted) return;
+
+    if (_isDialogActive) return;
+
+    _isDialogActive = true;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Anulează'),
+          ),
+          TextButton(
+            onPressed: () {
+              onConfirm();
+
+              Navigator.pop(context);
+            },
+            child: const Text('Da'),
+          ),
+        ],
+      ),
+    ).then((_) {
+      _isDialogActive = false;
+    });
+  });
+}

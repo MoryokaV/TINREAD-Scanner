@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_rfid_scanner/models/user_model.dart';
 import 'package:tinread_rfid_scanner/providers/connectivity_provider.dart';
+import 'package:tinread_rfid_scanner/providers/settings_provider.dart';
 import 'package:tinread_rfid_scanner/providers/user_provider.dart';
 import 'package:tinread_rfid_scanner/services/localstorage_service.dart';
 import 'package:tinread_rfid_scanner/utils/navigation_util.dart';
@@ -20,14 +21,13 @@ void main() async {
     DeviceOrientation.portraitUp,
   ]);
 
-  Responsive.init();
+  await Responsive.init();
 
   await LocalStorage.init();
 
   User? user = await LocalStorage.getUserDetails();
   // initialRoute = user == null ? Routes.login : Routes.home;
 
-  // TODO: work in progres
   initialRoute = Routes.home;
 
   runApp(
@@ -35,6 +35,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider(user)),
         ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
       child: MyApp(),
     ),
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: PageRouter.generateRoute,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      // locale: Locale("en"), // for testing purposes only
+      locale: Locale("ro"), // for testing purposes only
       localeResolutionCallback: (locale, supportedLocales) {
         if (locale == null) {
           return const Locale('en'); // Default to English

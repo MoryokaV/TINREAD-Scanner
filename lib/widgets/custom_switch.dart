@@ -39,14 +39,13 @@ class _CustomSwitchState extends State<CustomSwitch> {
                   curve: Curves.easeIn,
                   child: Container(
                     width: 25,
-                    decoration:
-                        BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(100), boxShadow: [
-                      BoxShadow(
-                        offset: Offset(0, 2),
-                        color: Colors.black12,
-                        blurRadius: 4
-                      ),
-                    ]),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(100),
+                      boxShadow: [
+                        BoxShadow(offset: Offset(0, 2), color: Colors.black12, blurRadius: 4),
+                      ],
+                    ),
                   ),
                 ),
               ],

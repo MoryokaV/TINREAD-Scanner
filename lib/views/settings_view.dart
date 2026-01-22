@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_rfid_scanner/models/user_model.dart';
+import 'package:tinread_rfid_scanner/providers/settings_provider.dart';
 import 'package:tinread_rfid_scanner/providers/user_provider.dart';
 import 'package:tinread_rfid_scanner/utils/responsive.dart';
 import 'package:tinread_rfid_scanner/utils/router.dart';
@@ -37,6 +38,8 @@ class _SettingsViewState extends State<SettingsView> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<SettingsProvider>().settings;
+
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -62,12 +65,12 @@ class _SettingsViewState extends State<SettingsView> {
                       crossAxisAlignment: .start,
                       children: [
                         Text(
-                          "Andrei Popescu",
+                          "Utilizator",
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
                         SizedBox(height: 10),
                         Text(
-                          "Biblioteca Județeană \"Panait Istrati\" Brăila",
+                          "UNȘTPB - Centrul Universitar Pitești",
                           style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: kDimmedForegroundColor),
                         ),
                         SizedBox(height: 15),
@@ -118,8 +121,10 @@ class _SettingsViewState extends State<SettingsView> {
               leading: SizedBox(
                 height: 30,
                 child: CustomSwitch(
-                  enabled: true,
-                  onTap: () {},
+                  enabled: settings.soundEnabled,
+                  onTap: () {
+                    context.read<SettingsProvider>().setSound(!settings.soundEnabled);
+                  },
                 ),
               ),
             ),
@@ -153,7 +158,7 @@ class _SettingsViewState extends State<SettingsView> {
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: Text(
                 //TODO: dynamic build and version
-                "Powered by IME România 2025 © v3.5.3 build 12836",
+                "Powered by IME România 2026 © v1.0.1 build 1436",
                 style: Theme.of(context).textTheme.labelSmall,
                 textAlign: TextAlign.center,
               ),

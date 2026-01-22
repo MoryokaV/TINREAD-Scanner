@@ -80,7 +80,7 @@ class _HomeViewState extends State<HomeView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
-                "Biblioteca Județeană \"Panait Istrati\" Brăila",
+                "UNȘTPB - Centrul Universitar Pitești",
                 style: Theme.of(context).textTheme.headlineLarge,
                 textAlign: .center,
               ),

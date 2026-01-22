@@ -5,12 +5,11 @@ import 'package:tinread_rfid_scanner/services/connectivity_service.dart';
 class ConnectivityProvider extends ChangeNotifier with WidgetsBindingObserver {
   final ConnectivityService _service = ConnectivityService();
 
+  bool _isChecking = false;
+  Timer? _timer;
+
   bool _isOnline = true;
   bool get isOnline => _isOnline;
-
-  bool _isChecking = false;
-
-  Timer? _timer;
 
   ConnectivityProvider() {
     WidgetsBinding.instance.addObserver(this);
@@ -22,7 +21,7 @@ class ConnectivityProvider extends ChangeNotifier with WidgetsBindingObserver {
     _timer?.cancel();
     _checkStatus();
 
-    _timer = Timer.periodic(const Duration(seconds: 10), (_) => _checkStatus());
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) => _checkStatus());
   }
 
   void _startAdaptiveTimer() {
