@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_rfid_scanner/providers/connectivity_provider.dart';
 import 'package:tinread_rfid_scanner/utils/responsive.dart';
-import 'package:tinread_rfid_scanner/utils/router.dart';
 import 'package:tinread_rfid_scanner/utils/style.dart';
+import 'package:tinread_rfid_scanner/widgets/select_scanner_modal.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -21,7 +21,7 @@ class _HomeViewState extends State<HomeView> {
     required String name,
     required void Function() onTap,
   }) {
-    double itemSize = (Responsive.screenWidth - 49) / 2;
+    double itemSize = (Responsive.screenWidth - 39) / 2;
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),
@@ -142,9 +142,7 @@ class _HomeViewState extends State<HomeView> {
                   context,
                   icon: "assets/icons/book.svg",
                   name: AppLocalizations.of(context).inventory,
-                  onTap: () {
-                    Navigator.pushNamed(context, Routes.inventory);
-                  },
+                  onTap: () => openScannerSelectModal(context),
                 ),
                 buildMultimediaItemContainer(
                   context,

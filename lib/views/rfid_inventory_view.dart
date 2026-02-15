@@ -7,14 +7,14 @@ import 'package:tinread_rfid_scanner/utils/responsive.dart';
 import 'package:tinread_rfid_scanner/utils/style.dart';
 import 'package:tinread_rfid_scanner/widgets/separator_widget.dart';
 
-class InventoryView extends StatefulWidget {
-  const InventoryView({super.key});
+class RfidInventoryView extends StatefulWidget {
+  const RfidInventoryView({super.key});
 
   @override
-  State<InventoryView> createState() => _InventoryViewState();
+  State<RfidInventoryView> createState() => _RfidInventoryViewState();
 }
 
-class _InventoryViewState extends State<InventoryView> {
+class _RfidInventoryViewState extends State<RfidInventoryView> {
   late List<String> filters = [];
   late String selectedFilter;
 

@@ -12,6 +12,8 @@ import 'package:tinread_rfid_scanner/utils/responsive.dart';
 import 'package:tinread_rfid_scanner/utils/style.dart';
 import 'package:tinread_rfid_scanner/widgets/alert_dialog.dart';
 
+// TODO: autosave (check on crash)
+
 class CameraInventoryView extends StatefulWidget {
   const CameraInventoryView({super.key});
 
