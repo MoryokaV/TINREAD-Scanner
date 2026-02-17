@@ -57,6 +57,15 @@ class AppLocalizationsRo extends AppLocalizations {
   String get inventory => 'Inventariere';
 
   @override
+  String get emptyInventory => 'Inventarul este gol';
+
+  @override
+  String get rfidInventory => 'Inventariere RFID';
+
+  @override
+  String get barcodeInventory => 'Inventariere Barcode';
+
+  @override
   String get uploadToTINREAD => 'Încarcă în TINREAD';
 
   @override

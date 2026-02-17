@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_scanner/providers/connectivity_provider.dart';
+import 'package:tinread_scanner/services/rfid_service.dart';
 import 'package:tinread_scanner/utils/responsive.dart';
 import 'package:tinread_scanner/utils/style.dart';
 import 'package:tinread_scanner/widgets/separator_widget.dart';
@@ -14,9 +15,23 @@ class RfidInventoryView extends StatefulWidget {
   State<RfidInventoryView> createState() => _RfidInventoryViewState();
 }
 
-class _RfidInventoryViewState extends State<RfidInventoryView> {
+class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindingObserver {
   late List<String> filters = [];
   late String selectedFilter;
+  late final RfidService _rfidService;
+
+  bool isScanning = false;
+  List<String> tags = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
+    _rfidService = RfidService();
+    _rfidService.onTagsReceived = onTagsReceived;
+  }
 
   @override
   void didChangeDependencies() {
@@ -24,6 +39,50 @@ class _RfidInventoryViewState extends State<RfidInventoryView> {
 
     filters = [AppLocalizations.of(context).all, AppLocalizations.of(context).errors];
     selectedFilter = filters[0];
+  }
+
+  void onTagsReceived(List<String> newTags) {
+    if (!mounted) return;
+
+    setState(() {
+      tags.addAll(newTags);
+    });
+  }
+
+  void toggleScan() => isScanning ? stopScan() : startScan();
+
+  void startScan() {
+    _rfidService.startScan();
+
+    setState(() => isScanning = true);
+  }
+
+  void stopScan() {
+    _rfidService.stopScan();
+
+    setState(() => isScanning = false);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      stopScan();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
+    stopScan();
+
+    _rfidService.onTagsReceived = null;
+    super.dispose();
   }
 
   @override
@@ -37,7 +96,7 @@ class _RfidInventoryViewState extends State<RfidInventoryView> {
         backgroundColor: Colors.white,
         iconTheme: IconTheme.of(context).copyWith(color: kForegroundColor),
         title: Text(
-          AppLocalizations.of(context).inventory,
+          AppLocalizations.of(context).rfidInventory,
           style: Theme.of(context).textTheme.headlineLarge,
         ),
       ),
@@ -149,9 +208,13 @@ class _RfidInventoryViewState extends State<RfidInventoryView> {
                 ],
               ),
             ),
-            ItemsTable(),
+            ItemsTable(
+              tags: tags,
+            ),
             BottomActionBar(
               isOnline: isOnline,
+              isScanning: isScanning,
+              toggleScan: toggleScan,
             ),
           ],
         ),
@@ -161,16 +224,21 @@ class _RfidInventoryViewState extends State<RfidInventoryView> {
 }
 
 class ItemsTable extends StatefulWidget {
-  const ItemsTable({super.key});
+  final List<String> tags;
+
+  const ItemsTable({
+    super.key,
+    required this.tags,
+  });
 
   @override
   State<ItemsTable> createState() => _ItemsTableState();
 }
 
 class _ItemsTableState extends State<ItemsTable> {
-  final tableCol1Width = Responsive.screenWidth / 4;
+  final tableCol1Width = Responsive.screenWidth / 4.5;
   final tableCol2Width = Responsive.screenWidth / 2 - 12;
-  final tableCol3Width = Responsive.screenWidth / 4 - 12;
+  final tableCol3Width = Responsive.screenWidth / 3.6 - 12;
 
   @override
   Widget build(BuildContext context) {
@@ -202,71 +270,91 @@ class _ItemsTableState extends State<ItemsTable> {
           ),
           Separator(),
           Expanded(
-            child: ListView.builder(
-              padding: .zero,
-              itemCount: 40,
-              shrinkWrap: true,
-              physics: ScrollPhysics(),
-              itemBuilder: (context, index) {
-                return Container(
-                  padding: .symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: index % 2 == 1 ? lightGrey : kBackgroundColor,
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: tableCol1Width,
-                        child: Text("5672"),
-                      ),
-                      SizedBox(
-                        width: tableCol2Width,
-                        child: Text("În inventariere"),
-                      ),
-                      SizedBox(
-                        width: tableCol3Width,
+            child: widget.tags.isNotEmpty
+                ? ListView.builder(
+                    padding: .zero,
+                    itemCount: widget.tags.length,
+                    shrinkWrap: true,
+                    physics: ScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      String tag = widget.tags[index];
+                      String tagUniqueId = tag.substring(tag.length - 5, tag.length - 1);
+
+                      return Container(
+                        padding: .symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: index % 2 == 1 ? lightGrey : kBackgroundColor,
+                        ),
                         child: Row(
-                          spacing: 12,
                           children: [
-                            IconButton(
-                              visualDensity: VisualDensity.compact,
-                              constraints: BoxConstraints(),
-                              splashRadius: 1,
-                              padding: .zero,
-                              onPressed: () {
-                                print("delete");
-                              },
-                              icon: FaIcon(
-                                FontAwesomeIcons.trashCan,
-                                color: kPrimaryColor,
-                                size: 18,
-                              ),
+                            SizedBox(
+                              width: tableCol1Width,
+                              child: Text(tagUniqueId),
                             ),
-                            IconButton(
-                              visualDensity: VisualDensity.compact,
-                              constraints: BoxConstraints(),
-                              splashRadius: 1,
-                              padding: .zero,
-                              onPressed: () {
-                                print("compass");
-                              },
-                              icon: FaIcon(
-                                FontAwesomeIcons.compass,
-                                color: kPrimaryColor,
-                                size: 18,
+                            SizedBox(
+                              width: tableCol2Width,
+                              child: Text("În inventariere"),
+                            ),
+                            SizedBox(
+                              width: tableCol3Width,
+                              child: Row(
+                                spacing: 12,
+                                children: [
+                                  IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    constraints: BoxConstraints(),
+                                    splashRadius: 1,
+                                    padding: .zero,
+                                    onPressed: () {
+                                      print("delete");
+                                    },
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.trashCan,
+                                      color: kPrimaryColor,
+                                      size: 18,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    constraints: BoxConstraints(),
+                                    splashRadius: 1,
+                                    padding: .zero,
+                                    onPressed: () {
+                                      print("compass");
+                                    },
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.compass,
+                                      color: kPrimaryColor,
+                                      size: 18,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
+                      );
+                    },
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 15,
+                    children: [
+                      FaIcon(
+                        FontAwesomeIcons.circleInfo,
+                        color: kDisabledIconColor,
+                        size: 42,
+                      ),
+                      Text(
+                        AppLocalizations.of(context).emptyInventory,
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(color: kDisabledIconColor),
                       ),
                     ],
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),
@@ -276,10 +364,14 @@ class _ItemsTableState extends State<ItemsTable> {
 
 class BottomActionBar extends StatefulWidget {
   final bool isOnline;
+  final bool isScanning;
+  final VoidCallback toggleScan;
 
   const BottomActionBar({
     super.key,
     required this.isOnline,
+    required this.isScanning,
+    required this.toggleScan,
   });
 
   @override
@@ -333,7 +425,7 @@ class _BottomActionBarState extends State<BottomActionBar> {
           ),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: widget.toggleScan,
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 padding: EdgeInsets.symmetric(
@@ -345,7 +437,7 @@ class _BottomActionBarState extends State<BottomActionBar> {
                 ),
               ),
               child: Text(
-                "Start",
+                widget.isScanning ? "Stop" : "Start",
                 style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white),
               ),
             ),

@@ -146,7 +146,7 @@ class _SettingsViewState extends State<SettingsView> {
               ),
             ),
             MenuTile(
-              title: "${AppLocalizations.of(context).about} TINREAD RFID Scanner",
+              title: "${AppLocalizations.of(context).about} TINREAD Scanner",
               leading: FaIcon(
                 FontAwesomeIcons.chevronRight,
                 color: kDisabledIconColor,

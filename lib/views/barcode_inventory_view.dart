@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_scanner/providers/settings_provider.dart';
 import 'package:tinread_scanner/services/localstorage_service.dart';
 import 'package:tinread_scanner/utils/responsive.dart';
@@ -14,14 +15,14 @@ import 'package:tinread_scanner/widgets/alert_dialog.dart';
 
 // TODO: autosave (check on crash)
 
-class CameraInventoryView extends StatefulWidget {
-  const CameraInventoryView({super.key});
+class BarcodeInventoryView extends StatefulWidget {
+  const BarcodeInventoryView({super.key});
 
   @override
-  State<CameraInventoryView> createState() => _CameraInventoryViewState();
+  State<BarcodeInventoryView> createState() => _BarcodeInventoryViewState();
 }
 
-class _CameraInventoryViewState extends State<CameraInventoryView> with WidgetsBindingObserver {
+class _BarcodeInventoryViewState extends State<BarcodeInventoryView> with WidgetsBindingObserver {
   bool flash = false;
 
   late final AudioPlayer audioPlayer = AudioPlayer();
@@ -177,17 +178,11 @@ class _CameraInventoryViewState extends State<CameraInventoryView> with WidgetsB
           elevation: 2,
           titleSpacing: 0,
           centerTitle: true,
-          title: RichText(
-            text: TextSpan(
-              children: [
-                const TextSpan(
-                  text: "Inventariere",
-                ),
-              ],
-              style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 22,
-              ),
+          title: Text(
+            AppLocalizations.of(context).barcodeInventory,
+            style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 22,
             ),
           ),
           bottom: TabBar(

@@ -56,6 +56,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inventory => 'Inventory';
 
   @override
+  String get emptyInventory => 'The inventory is empty';
+
+  @override
+  String get rfidInventory => 'RFID Inventory';
+
+  @override
+  String get barcodeInventory => 'Barcode Inventory';
+
+  @override
   String get uploadToTINREAD => 'Upload to TINREAD';
 
   @override

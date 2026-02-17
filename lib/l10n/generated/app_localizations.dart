@@ -188,6 +188,24 @@ abstract class AppLocalizations {
   /// **'Inventory'**
   String get inventory;
 
+  /// No description provided for @emptyInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'The inventory is empty'**
+  String get emptyInventory;
+
+  /// No description provided for @rfidInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'RFID Inventory'**
+  String get rfidInventory;
+
+  /// No description provided for @barcodeInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode Inventory'**
+  String get barcodeInventory;
+
   /// No description provided for @uploadToTINREAD.
   ///
   /// In en, this message translates to:

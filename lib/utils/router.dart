@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tinread_scanner/views/camera_inventory_view.dart';
+import 'package:tinread_scanner/views/barcode_inventory_view.dart';
 import 'package:tinread_scanner/views/rfid_inventory_view.dart';
 import 'package:tinread_scanner/views/login_view.dart';
 import 'package:tinread_scanner/widgets/bottom_navbar.dart';
@@ -11,7 +11,7 @@ class Routes {
 
   static const login = "/login";
   static const home = '/home';
-  static const cameraInventory = "/camera_inventory";
+  static const barcodeInventory = "/barcode_inventory";
   static const rfidInventory = "/rfid_inventory";
 }
 
@@ -22,8 +22,8 @@ class PageRouter {
         return adaptivePageRoute(builder: (context) => const BottomNavbar());
       case Routes.login:
         return adaptivePageRoute(builder: (context) => LoginView());
-      case Routes.cameraInventory:
-        return adaptivePageRoute(builder: (context) => CameraInventoryView());
+      case Routes.barcodeInventory:
+        return adaptivePageRoute(builder: (context) => BarcodeInventoryView());
       case Routes.rfidInventory:
         return adaptivePageRoute(builder: (context) => RfidInventoryView());
       default:

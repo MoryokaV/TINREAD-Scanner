@@ -27,6 +27,9 @@
     "description": "Error popup body text"
   },
   "inventory": "Inventory",
+  "emptyInventory": "The inventory is empty",
+  "rfidInventory": "RFID Inventory",
+  "barcodeInventory": "Barcode Inventory",
   "uploadToTINREAD": "Upload to TINREAD",
   "downloadFile": "Download file",
   "reset": "Reset",

@@ -39,7 +39,10 @@ void openScannerSelectModal(BuildContext context) {
                 ),
                 const SizedBox(height: 24),
                 InkWell(
-                  onTap: () => Navigator.pushNamed(context, Routes.rfidInventory),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, Routes.rfidInventory);
+                  },
                   borderRadius: BorderRadius.circular(16),
                   child: Ink(
                     padding: EdgeInsets.symmetric(
@@ -86,7 +89,10 @@ void openScannerSelectModal(BuildContext context) {
                 ),
                 SizedBox(height: 12),
                 InkWell(
-                  onTap: () => Navigator.pushNamed(context, Routes.cameraInventory),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, Routes.barcodeInventory);
+                  },
                   borderRadius: BorderRadius.circular(16),
                   child: Ink(
                     padding: EdgeInsets.symmetric(
