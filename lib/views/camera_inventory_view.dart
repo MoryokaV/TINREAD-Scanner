@@ -6,11 +6,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:tinread_rfid_scanner/providers/settings_provider.dart';
-import 'package:tinread_rfid_scanner/services/localstorage_service.dart';
-import 'package:tinread_rfid_scanner/utils/responsive.dart';
-import 'package:tinread_rfid_scanner/utils/style.dart';
-import 'package:tinread_rfid_scanner/widgets/alert_dialog.dart';
+import 'package:tinread_scanner/providers/settings_provider.dart';
+import 'package:tinread_scanner/services/localstorage_service.dart';
+import 'package:tinread_scanner/utils/responsive.dart';
+import 'package:tinread_scanner/utils/style.dart';
+import 'package:tinread_scanner/widgets/alert_dialog.dart';
 
 // TODO: autosave (check on crash)
 

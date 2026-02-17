@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
-import 'package:tinread_rfid_scanner/utils/style.dart';
-import 'package:tinread_rfid_scanner/views/home_view.dart';
-import 'package:tinread_rfid_scanner/views/settings_view.dart';
+import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
+import 'package:tinread_scanner/utils/style.dart';
+import 'package:tinread_scanner/views/home_view.dart';
+import 'package:tinread_scanner/views/settings_view.dart';
 
 class BottomNavbar extends StatefulWidget {
   const BottomNavbar({super.key});

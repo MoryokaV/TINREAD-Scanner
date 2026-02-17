@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:tinread_rfid_scanner/models/user_model.dart';
-import 'package:tinread_rfid_scanner/utils/api_exceptions.dart';
+import 'package:tinread_scanner/models/user_model.dart';
+import 'package:tinread_scanner/utils/api_exceptions.dart';
 
 class UserController {
   Future<void> login(User user) async {

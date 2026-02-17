@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
-import 'package:tinread_rfid_scanner/models/user_model.dart';
-import 'package:tinread_rfid_scanner/providers/connectivity_provider.dart';
-import 'package:tinread_rfid_scanner/providers/settings_provider.dart';
-import 'package:tinread_rfid_scanner/providers/user_provider.dart';
-import 'package:tinread_rfid_scanner/services/localstorage_service.dart';
-import 'package:tinread_rfid_scanner/utils/navigation_util.dart';
-import 'package:tinread_rfid_scanner/utils/responsive.dart';
-import 'package:tinread_rfid_scanner/utils/router.dart';
-import 'package:tinread_rfid_scanner/utils/style.dart';
+import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
+import 'package:tinread_scanner/models/user_model.dart';
+import 'package:tinread_scanner/providers/connectivity_provider.dart';
+import 'package:tinread_scanner/providers/settings_provider.dart';
+import 'package:tinread_scanner/providers/user_provider.dart';
+import 'package:tinread_scanner/services/localstorage_service.dart';
+import 'package:tinread_scanner/utils/navigation_util.dart';
+import 'package:tinread_scanner/utils/responsive.dart';
+import 'package:tinread_scanner/utils/router.dart';
+import 'package:tinread_scanner/utils/style.dart';
 
 late final String initialRoute;
 

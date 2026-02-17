@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:tinread_rfid_scanner/utils/responsive.dart';
-import 'package:tinread_rfid_scanner/utils/router.dart';
-import 'package:tinread_rfid_scanner/utils/style.dart';
+import 'package:tinread_scanner/utils/responsive.dart';
+import 'package:tinread_scanner/utils/router.dart';
+import 'package:tinread_scanner/utils/style.dart';
 
 void openScannerSelectModal(BuildContext context) {
   showModalBottomSheet(

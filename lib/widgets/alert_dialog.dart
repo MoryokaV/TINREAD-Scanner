@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
-import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
-import 'package:tinread_rfid_scanner/utils/api_exceptions.dart';
+import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
+import 'package:tinread_scanner/utils/api_exceptions.dart';
 
 bool _isDialogActive = false;
 

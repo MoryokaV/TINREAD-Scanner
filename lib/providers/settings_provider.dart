@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tinread_rfid_scanner/models/appsettings_model.dart';
-import 'package:tinread_rfid_scanner/services/localstorage_service.dart';
+import 'package:tinread_scanner/models/appsettings_model.dart';
+import 'package:tinread_scanner/services/localstorage_service.dart';
 
 class SettingsProvider extends ChangeNotifier {
   late AppSettings settings;

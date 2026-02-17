@@ -9,7 +9,7 @@
 
     <application
         android:requestLegacyExternalStorage="true"
-        android:label="TINREAD RFID Scanner"
+        android:label="TINREAD Scanner"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

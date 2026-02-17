@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tinread_rfid_scanner/models/appsettings_model.dart';
-import 'package:tinread_rfid_scanner/models/user_model.dart' show User;
+import 'package:tinread_scanner/models/appsettings_model.dart';
+import 'package:tinread_scanner/models/user_model.dart' show User;
 
 class _Keys {
   _Keys._();

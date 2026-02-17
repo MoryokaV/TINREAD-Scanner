@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
-import 'package:tinread_rfid_scanner/providers/connectivity_provider.dart';
-import 'package:tinread_rfid_scanner/utils/responsive.dart';
-import 'package:tinread_rfid_scanner/utils/style.dart';
-import 'package:tinread_rfid_scanner/widgets/select_scanner_modal.dart';
+import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
+import 'package:tinread_scanner/providers/connectivity_provider.dart';
+import 'package:tinread_scanner/utils/responsive.dart';
+import 'package:tinread_scanner/utils/style.dart';
+import 'package:tinread_scanner/widgets/select_scanner_modal.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});

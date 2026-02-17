@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:tinread_rfid_scanner/services/connectivity_service.dart';
+import 'package:tinread_scanner/services/connectivity_service.dart';
 
 class ConnectivityProvider extends ChangeNotifier with WidgetsBindingObserver {
   final ConnectivityService _service = ConnectivityService();

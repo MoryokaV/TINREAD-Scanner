@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tinread_rfid_scanner/views/camera_inventory_view.dart';
-import 'package:tinread_rfid_scanner/views/rfid_inventory_view.dart';
-import 'package:tinread_rfid_scanner/views/login_view.dart';
-import 'package:tinread_rfid_scanner/widgets/bottom_navbar.dart';
+import 'package:tinread_scanner/views/camera_inventory_view.dart';
+import 'package:tinread_scanner/views/rfid_inventory_view.dart';
+import 'package:tinread_scanner/views/login_view.dart';
+import 'package:tinread_scanner/widgets/bottom_navbar.dart';
 
 class Routes {
   Routes._();

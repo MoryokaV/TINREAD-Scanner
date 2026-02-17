@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tinread_rfid_scanner/l10n/generated/app_localizations.dart';
-import 'package:tinread_rfid_scanner/providers/connectivity_provider.dart';
-import 'package:tinread_rfid_scanner/utils/responsive.dart';
-import 'package:tinread_rfid_scanner/utils/style.dart';
-import 'package:tinread_rfid_scanner/widgets/separator_widget.dart';
+import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
+import 'package:tinread_scanner/providers/connectivity_provider.dart';
+import 'package:tinread_scanner/utils/responsive.dart';
+import 'package:tinread_scanner/utils/style.dart';
+import 'package:tinread_scanner/widgets/separator_widget.dart';
 
 class RfidInventoryView extends StatefulWidget {
   const RfidInventoryView({super.key});

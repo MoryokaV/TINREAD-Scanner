@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:tinread_rfid_scanner/models/user_model.dart';
-import 'package:tinread_rfid_scanner/services/localstorage_service.dart';
+import 'package:tinread_scanner/models/user_model.dart';
+import 'package:tinread_scanner/services/localstorage_service.dart';
 
 class UserProvider extends ChangeNotifier {
   User? currentUser;

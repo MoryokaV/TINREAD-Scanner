@@ -1,4 +1,4 @@
-package com.imeromania.tinread_rfid_scanner;
+package com.imeromania.tinread_scanner;
 
 import android.os.Bundle;
 import io.flutter.embedding.android.FlutterActivity;
