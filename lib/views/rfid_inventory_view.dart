@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,8 @@ import 'package:tinread_scanner/utils/responsive.dart';
 import 'package:tinread_scanner/utils/style.dart';
 import 'package:tinread_scanner/widgets/separator_widget.dart';
 
-// TODO: autosave
+// ignore: constant_identifier_names
+const int AUTOSAVE_INTERLVAL = 15;
 
 class RfidInventoryView extends StatefulWidget {
   const RfidInventoryView({super.key});
@@ -39,6 +41,7 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
     _tagsProvider = context.read<TagsProvider>();
 
     tags = _tagsProvider.scannedTags;
+    autosave();
   }
 
   @override
@@ -47,6 +50,14 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
 
     filters = [AppLocalizations.of(context).all, AppLocalizations.of(context).errors];
     selectedFilter = filters[0];
+  }
+
+  void autosave() {
+    Timer.periodic(const Duration(seconds: AUTOSAVE_INTERLVAL), (_) async {
+      if (isScanning) {
+        await _tagsProvider.save(tags);
+      }
+    });
   }
 
   void onTagsReceived(List<String> newTids) {
