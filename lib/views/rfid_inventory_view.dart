@@ -11,7 +11,6 @@ import 'package:tinread_scanner/utils/responsive.dart';
 import 'package:tinread_scanner/utils/style.dart';
 import 'package:tinread_scanner/widgets/separator_widget.dart';
 
-// ignore: constant_identifier_names
 const int AUTOSAVE_INTERLVAL = 15;
 
 class RfidInventoryView extends StatefulWidget {

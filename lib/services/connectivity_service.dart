@@ -1,7 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:tinread_scanner/utils/url_constants.dart';
 
-// ignore: constant_identifier_names
 const int PING_TIMEOUT_SECONDS = 3;
 
 class ConnectivityService {
