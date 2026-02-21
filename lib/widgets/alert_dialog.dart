@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'dart:io' show Platform;
 import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_scanner/utils/api_exceptions.dart';
 
@@ -19,12 +17,12 @@ void showErrorDialog(BuildContext context, ApiException exception) {
       content = AppLocalizations.of(context).unauthDialogContent;
   }
 
-  _showAdaptiveDialog(context, title, content);
+  _showAndroidDialog(context, title, content);
 }
 
-void showInfoDialog(BuildContext context, String title, String content) => _showAdaptiveDialog(context, title, content);
+void showInfoDialog(BuildContext context, String title, String content) => _showAndroidDialog(context, title, content);
 
-void _showAdaptiveDialog(BuildContext context, String title, String content) {
+void _showAndroidDialog(BuildContext context, String title, String content) {
   Future.delayed(Duration.zero, () {
     if (!context.mounted) return;
 
@@ -32,45 +30,24 @@ void _showAdaptiveDialog(BuildContext context, String title, String content) {
 
     _isDialogActive = true;
 
-    if (Platform.isIOS) {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) => CupertinoAlertDialog(
-          title: Text(title),
-          content: Text(content),
-          actions: [
-            CupertinoDialogAction(
-              child: const Text("Ok"),
-              onPressed: () {
-                _isDialogActive = false;
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ).then((_) {
-        _isDialogActive = false;
-      });
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(title),
-          content: Text(content),
-          actions: [
-            TextButton(
-              child: const Text("Ok"),
-              onPressed: () {
-                _isDialogActive = false;
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ).then((_) {
-        _isDialogActive = false;
-      });
-    }
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            child: const Text("Ok"),
+            onPressed: () {
+              _isDialogActive = false;
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    ).then((_) {
+      _isDialogActive = false;
+    });
   });
 }
 

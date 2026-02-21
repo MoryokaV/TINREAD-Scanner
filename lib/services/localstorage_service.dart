@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tinread_scanner/models/appsettings_model.dart';
+import 'package:tinread_scanner/models/tag_model.dart';
 import 'package:tinread_scanner/models/user_model.dart' show User;
 
 class _Keys {
@@ -10,6 +11,7 @@ class _Keys {
   static const settings = 'app_settings';
   static const login = 'user';
   static const inventory = "current_inventory";
+  static const tags = "saved_tags";
 }
 
 class LocalStorage {
@@ -47,6 +49,26 @@ class LocalStorage {
     List<String>? scannedItems = sharedPrefs.getStringList(_Keys.inventory);
 
     return scannedItems;
+  }
+
+  static Future<void> saveScannedTags(List<Tag> newTags) async {
+    String tagsJSON = jsonEncode(newTags);
+
+    await sharedPrefs.setString(_Keys.tags, tagsJSON);
+  }
+
+  static List<Tag> loadSavedTags() {
+    String? savedTagsJSON = sharedPrefs.getString(_Keys.tags);
+
+    if (savedTagsJSON != null) {
+      return List<Tag>.from(
+        jsonDecode(savedTagsJSON).map(
+          (savedTagJSON) => Tag.fromJson(savedTagJSON),
+        ),
+      );
+    }
+
+    return [];
   }
 
   // -- SECURE STORAGE

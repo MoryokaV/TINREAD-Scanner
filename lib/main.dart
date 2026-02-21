@@ -5,6 +5,7 @@ import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_scanner/models/user_model.dart';
 import 'package:tinread_scanner/providers/connectivity_provider.dart';
 import 'package:tinread_scanner/providers/settings_provider.dart';
+import 'package:tinread_scanner/providers/tags_provider.dart';
 import 'package:tinread_scanner/providers/user_provider.dart';
 import 'package:tinread_scanner/services/localstorage_service.dart';
 import 'package:tinread_scanner/utils/navigation_util.dart';
@@ -36,6 +37,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => UserProvider(user)),
         ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => TagsProvider()),
       ],
       child: MyApp(),
     ),

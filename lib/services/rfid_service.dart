@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 class RfidService {
-  static const platform = MethodChannel("com.imeromania.tinread_scanner/rfid");
+  static const _platform = MethodChannel("com.imeromania.tinread_scanner/rfid");
 
   static final RfidService _instance = RfidService._internal();
   factory RfidService() => _instance;
@@ -9,26 +9,26 @@ class RfidService {
   Function(List<String>)? onTagsReceived;
 
   RfidService._internal() {
-    platform.setMethodCallHandler(_handleMethod);
+    _platform.setMethodCallHandler(_handleMethod);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onTagsRead":
-        List<dynamic> rawTags = call.arguments;
-        List<String> tags = rawTags.cast<String>();
+        List<dynamic> rawTids = call.arguments;
+        List<String> tids = rawTids.cast<String>();
 
         if (onTagsReceived != null) {
-          onTagsReceived!(tags);
+          onTagsReceived!(tids);
         }
-      default: 
+      default:
         print("Unimplemented method: ${call.method}");
     }
   }
 
   Future<void> startScan() async {
     try {
-      await platform.invokeMethod("startScan");
+      await _platform.invokeMethod("startScan");
     } on PlatformException catch (e) {
       print("PlatformError: ${e.message}");
     }
@@ -36,7 +36,7 @@ class RfidService {
 
   Future<void> stopScan() async {
     try {
-      await platform.invokeMethod("stopScan");
+      await _platform.invokeMethod("stopScan");
     } on PlatformException catch (e) {
       print("PlatformError: ${e.message}");
     }
@@ -44,7 +44,15 @@ class RfidService {
 
   Future<void> clearScan() async {
     try {
-      await platform.invokeMethod("clearScan");
+      await _platform.invokeMethod("clearScan");
+    } on PlatformException catch (e) {
+      print("PlatformError: ${e.message}");
+    }
+  }
+
+  Future<void> syncSavedTids(List<String> tids) async {
+    try {
+      await _platform.invokeMethod("syncSavedTags", tids);
     } on PlatformException catch (e) {
       print("PlatformError: ${e.message}");
     }

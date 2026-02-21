@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
+import 'package:tinread_scanner/models/tag_model.dart';
 import 'package:tinread_scanner/providers/connectivity_provider.dart';
+import 'package:tinread_scanner/providers/tags_provider.dart';
 import 'package:tinread_scanner/services/rfid_service.dart';
 import 'package:tinread_scanner/utils/responsive.dart';
 import 'package:tinread_scanner/utils/style.dart';
 import 'package:tinread_scanner/widgets/separator_widget.dart';
+
+// TODO: autosave
 
 class RfidInventoryView extends StatefulWidget {
   const RfidInventoryView({super.key});
@@ -19,9 +23,10 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
   late List<String> filters = [];
   late String selectedFilter;
   late final RfidService _rfidService;
+  late final TagsProvider _tagsProvider;
 
   bool isScanning = false;
-  List<String> tags = [];
+  late List<Tag> tags;
 
   @override
   void initState() {
@@ -31,6 +36,9 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
 
     _rfidService = RfidService();
     _rfidService.onTagsReceived = onTagsReceived;
+    _tagsProvider = context.read<TagsProvider>();
+
+    tags = _tagsProvider.scannedTags;
   }
 
   @override
@@ -41,26 +49,39 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
     selectedFilter = filters[0];
   }
 
-  void onTagsReceived(List<String> newTags) {
+  void onTagsReceived(List<String> newTids) {
     if (!mounted) return;
+
+    List<Tag> newTags = [];
+
+    for (final tid in newTids) {
+      newTags.add(
+        Tag(
+          tid: tid,
+        ),
+      );
+    }
 
     setState(() {
       tags.addAll(newTags);
     });
   }
 
-  void toggleScan() => isScanning ? stopScan() : startScan();
-
-  void startScan() {
-    _rfidService.startScan();
-
-    setState(() => isScanning = true);
+  Future<void> toggleScan() async {
+    isScanning ? await stopScan() : await startScan();
   }
 
-  void stopScan() {
-    _rfidService.stopScan();
+  Future<void> startScan() async {
+    await _rfidService.startScan();
 
-    setState(() => isScanning = false);
+    if (mounted) setState(() => isScanning = true);
+  }
+
+  Future<void> stopScan() async {
+    await _rfidService.stopScan();
+    await _tagsProvider.save(tags);
+
+    if (mounted) setState(() => isScanning = false);
   }
 
   @override
@@ -224,7 +245,7 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
 }
 
 class ItemsTable extends StatefulWidget {
-  final List<String> tags;
+  final List<Tag> tags;
 
   const ItemsTable({
     super.key,
@@ -277,8 +298,8 @@ class _ItemsTableState extends State<ItemsTable> {
                     shrinkWrap: true,
                     physics: ScrollPhysics(),
                     itemBuilder: (context, index) {
-                      String tag = widget.tags[index];
-                      String tagUniqueId = tag.substring(tag.length - 5, tag.length - 1);
+                      String tid = widget.tags[index].tid;
+                      String tidUniqueId = tid.substring(tid.length - 5, tid.length - 1);
 
                       return Container(
                         padding: .symmetric(
@@ -292,7 +313,7 @@ class _ItemsTableState extends State<ItemsTable> {
                           children: [
                             SizedBox(
                               width: tableCol1Width,
-                              child: Text(tagUniqueId),
+                              child: Text(tidUniqueId),
                             ),
                             SizedBox(
                               width: tableCol2Width,
@@ -365,7 +386,7 @@ class _ItemsTableState extends State<ItemsTable> {
 class BottomActionBar extends StatefulWidget {
   final bool isOnline;
   final bool isScanning;
-  final VoidCallback toggleScan;
+  final Future<void> Function() toggleScan;
 
   const BottomActionBar({
     super.key,

@@ -29,7 +29,7 @@ public class MainActivity extends FlutterActivity {
     private static final String RFID_CHANNEL = "com.imeromania.tinread_scanner/rfid";
     private final short RFID_TIMEOUT_MS = 100;
     public UHFRManager mUhfrManager;
-    private Set<String> uniqueEpcSet = Collections.synchronizedSet(new HashSet<>());
+    private final Set<String> uniqueEpcSet = Collections.synchronizedSet(new HashSet<>());
     private boolean isScanning = false;
     private final ExecutorService scanExecutor = Executors.newSingleThreadExecutor();
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
@@ -44,11 +44,14 @@ public class MainActivity extends FlutterActivity {
         rfidMethodChannel.setMethodCallHandler(
             (call, result) -> {
                 switch (call.method) {
+                    case "syncSavedTags" -> syncSavedTags(call.arguments());
                     case "startScan" -> startRFIDScan();
                     case "stopScan" -> stopRFIDScan();
                     case "clearScan" -> clearRFIDScanData();
                     default -> result.notImplemented();
                 }
+
+                result.success(true);
             }
         );
     }
@@ -69,6 +72,12 @@ public class MainActivity extends FlutterActivity {
         mUhfrManager.setGen2session(true);
 
         debugLog("RFID Module initialized");
+    }
+
+    private void syncSavedTags(List<String> savedTags) {
+        if (savedTags != null) {
+            uniqueEpcSet.addAll(savedTags);
+        }
     }
 
     private void startRFIDScan() {
@@ -94,7 +103,6 @@ public class MainActivity extends FlutterActivity {
                             if (uniqueEpcSet.add(epc)) {
                                 newUniqueTagsToSend.add(epc);
 
-                                // TODO: optional beep sound
                                 debugLog("Tag nou: " + epc);
                             }
                         }

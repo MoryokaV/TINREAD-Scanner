@@ -3,8 +3,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_scanner/providers/connectivity_provider.dart';
+import 'package:tinread_scanner/providers/tags_provider.dart';
 import 'package:tinread_scanner/utils/responsive.dart';
 import 'package:tinread_scanner/utils/style.dart';
+import 'package:tinread_scanner/widgets/alert_dialog.dart';
 import 'package:tinread_scanner/widgets/select_scanner_modal.dart';
 
 class HomeView extends StatefulWidget {
@@ -160,7 +162,16 @@ class _HomeViewState extends State<HomeView> {
                   context,
                   icon: "assets/icons/eraser.svg",
                   name: AppLocalizations.of(context).reset,
-                  onTap: () {},
+                  onTap: () {
+                    showConfirmDialog(
+                      context,
+                      title: "Atenție!",
+                      content: "Ești sigur că vrei să ștergi toate etichetele scanate?",
+                      onConfirm: () async {
+                        await context.read<TagsProvider>().clear();
+                      },
+                    );
+                  },
                 ),
               ],
             ),

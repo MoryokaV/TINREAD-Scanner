@@ -7,8 +7,6 @@ class SettingsProvider extends ChangeNotifier {
 
   SettingsProvider() {
     settings = LocalStorage.loadSettings();
-
-    notifyListeners();
   }
 
   Future<void> _save() async {
