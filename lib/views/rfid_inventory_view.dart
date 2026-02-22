@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,8 @@ class RfidInventoryView extends StatefulWidget {
 }
 
 class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindingObserver {
+  late final AudioPlayer audioPlayer = AudioPlayer();
+
   late List<String> filters = [];
   late String selectedFilter;
   late final RfidService _rfidService;
@@ -75,6 +78,8 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
     setState(() {
       tags.addAll(newTags);
     });
+
+    audioPlayer.play(AssetSource("audio/beep.mp3"));
   }
 
   Future<void> toggleScan() async {
