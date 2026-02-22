@@ -4,11 +4,13 @@ import 'package:tinread_scanner/services/localstorage_service.dart';
 import 'package:tinread_scanner/services/rfid_service.dart';
 
 class TagsProvider extends ChangeNotifier {
+  late ScanType? activeScanType;
   late List<Tag> scannedTags;
   late final RfidService _rfidService;
 
   TagsProvider() {
     scannedTags = LocalStorage.loadSavedTags();
+    activeScanType = LocalStorage.getScanType();
 
     _sync();
   }
@@ -39,6 +41,13 @@ class TagsProvider extends ChangeNotifier {
 
     await _rfidService.clearScan();
     await LocalStorage.saveScannedTags(scannedTags);
+
+    notifyListeners();
+  }
+
+  Future<void> setActiveScanType(ScanType newType) async {
+    activeScanType = newType;
+    await LocalStorage.saveScanType(activeScanType.toString());
 
     notifyListeners();
   }

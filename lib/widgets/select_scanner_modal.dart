@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:tinread_scanner/models/tag_model.dart';
 import 'package:tinread_scanner/utils/responsive.dart';
 import 'package:tinread_scanner/utils/router.dart';
 import 'package:tinread_scanner/utils/style.dart';
 
-void openScannerSelectModal(BuildContext context) {
+void openScannerSelectModal(BuildContext context, Function(ScanType newType) setActiveScanType) {
   showModalBottomSheet(
     context: context,
     shape: RoundedRectangleBorder(
@@ -39,9 +40,10 @@ void openScannerSelectModal(BuildContext context) {
                 ),
                 const SizedBox(height: 24),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, Routes.rfidInventory);
+                    await setActiveScanType(ScanType.RFID);
                   },
                   borderRadius: BorderRadius.circular(16),
                   child: Ink(
@@ -89,9 +91,10 @@ void openScannerSelectModal(BuildContext context) {
                 ),
                 SizedBox(height: 12),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, Routes.barcodeInventory);
+                    await setActiveScanType(ScanType.Barcode);
                   },
                   borderRadius: BorderRadius.circular(16),
                   child: Ink(

@@ -12,21 +12,22 @@ class _Keys {
   static const login = 'user';
   static const inventory = "current_inventory";
   static const tags = "saved_tags";
+  static const scanType = "scan_type";
 }
 
 class LocalStorage {
   LocalStorage._();
 
-  static late SharedPreferences sharedPrefs;
-  static late FlutterSecureStorage secureStorage;
+  static late SharedPreferences _sharedPrefs;
+  static late FlutterSecureStorage _secureStorage;
 
   static Future<void> init() async {
-    secureStorage = FlutterSecureStorage();
-    sharedPrefs = await SharedPreferences.getInstance();
+    _secureStorage = FlutterSecureStorage();
+    _sharedPrefs = await SharedPreferences.getInstance();
   }
 
   static AppSettings loadSettings() {
-    String? settingsJSON = sharedPrefs.getString(_Keys.settings);
+    String? settingsJSON = _sharedPrefs.getString(_Keys.settings);
 
     if (settingsJSON != null) {
       return AppSettings.fromJson(jsonDecode(settingsJSON));
@@ -38,15 +39,15 @@ class LocalStorage {
   static Future<void> saveSettings(AppSettings settings) async {
     String settingsJSON = jsonEncode(settings.toJson());
 
-    await sharedPrefs.setString(_Keys.settings, settingsJSON);
+    await _sharedPrefs.setString(_Keys.settings, settingsJSON);
   }
 
   static Future<void> saveCurrentInventory(List<String> items) async {
-    await sharedPrefs.setStringList(_Keys.inventory, items);
+    await _sharedPrefs.setStringList(_Keys.inventory, items);
   }
 
   static List<String>? getCurrentInventory() {
-    List<String>? scannedItems = sharedPrefs.getStringList(_Keys.inventory);
+    List<String>? scannedItems = _sharedPrefs.getStringList(_Keys.inventory);
 
     return scannedItems;
   }
@@ -54,11 +55,11 @@ class LocalStorage {
   static Future<void> saveScannedTags(List<Tag> newTags) async {
     String tagsJSON = jsonEncode(newTags);
 
-    await sharedPrefs.setString(_Keys.tags, tagsJSON);
+    await _sharedPrefs.setString(_Keys.tags, tagsJSON);
   }
 
   static List<Tag> loadSavedTags() {
-    String? savedTagsJSON = sharedPrefs.getString(_Keys.tags);
+    String? savedTagsJSON = _sharedPrefs.getString(_Keys.tags);
 
     if (savedTagsJSON != null) {
       return List<Tag>.from(
@@ -71,10 +72,26 @@ class LocalStorage {
     return [];
   }
 
+  static Future<void> saveScanType(String type) async {
+    await _sharedPrefs.setString(_Keys.scanType, type);
+  }
+
+  static ScanType? getScanType() {
+    String? typeStr = _sharedPrefs.getString(_Keys.scanType);
+
+    if (typeStr == null) {
+      return null;
+    }
+
+    ScanType? type = ScanType.values.firstWhere((t) => t.toString() == typeStr);
+
+    return type;
+  }
+
   // -- SECURE STORAGE
 
   static Future<User?> getUserDetails() async {
-    String? userDetails = await secureStorage.read(key: _Keys.login);
+    String? userDetails = await _secureStorage.read(key: _Keys.login);
 
     if (userDetails == null) {
       return null;
@@ -84,10 +101,10 @@ class LocalStorage {
   }
 
   static Future<void> saveUserDetails(User user) async {
-    await secureStorage.write(key: _Keys.login, value: jsonEncode(user));
+    await _secureStorage.write(key: _Keys.login, value: jsonEncode(user));
   }
 
   static Future<void> deleteUserDetails() async {
-    await secureStorage.delete(key: _Keys.login);
+    await _secureStorage.delete(key: _Keys.login);
   }
 }

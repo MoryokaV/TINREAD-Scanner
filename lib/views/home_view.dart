@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
+import 'package:tinread_scanner/models/tag_model.dart';
 import 'package:tinread_scanner/providers/connectivity_provider.dart';
 import 'package:tinread_scanner/providers/tags_provider.dart';
 import 'package:tinread_scanner/utils/responsive.dart';
+import 'package:tinread_scanner/utils/router.dart';
 import 'package:tinread_scanner/utils/style.dart';
 import 'package:tinread_scanner/widgets/alert_dialog.dart';
 import 'package:tinread_scanner/widgets/select_scanner_modal.dart';
@@ -135,45 +137,73 @@ class _HomeViewState extends State<HomeView> {
               },
             ),
             Spacer(),
-            Wrap(
-              spacing: 15,
-              runSpacing: 15,
-              alignment: WrapAlignment.spaceBetween,
-              children: [
-                buildMultimediaItemContainer(
-                  context,
-                  icon: "assets/icons/book.svg",
-                  name: AppLocalizations.of(context).inventory,
-                  onTap: () => openScannerSelectModal(context),
-                ),
-                buildMultimediaItemContainer(
-                  context,
-                  icon: "assets/icons/upload.svg",
-                  name: AppLocalizations.of(context).uploadToTINREAD,
-                  onTap: () {},
-                ),
-                buildMultimediaItemContainer(
-                  context,
-                  icon: "assets/icons/download.svg",
-                  name: AppLocalizations.of(context).downloadFile,
-                  onTap: () {},
-                ),
-                buildMultimediaItemContainer(
-                  context,
-                  icon: "assets/icons/eraser.svg",
-                  name: AppLocalizations.of(context).reset,
-                  onTap: () {
-                    showConfirmDialog(
+            Consumer<TagsProvider>(
+              builder: (context, tagsProvider, _) {
+                return Wrap(
+                  spacing: 15,
+                  runSpacing: 15,
+                  alignment: WrapAlignment.spaceBetween,
+                  children: [
+                    buildMultimediaItemContainer(
                       context,
-                      title: "Atenție!",
-                      content: "Ești sigur că vrei să ștergi toate etichetele scanate?",
-                      onConfirm: () async {
-                        await context.read<TagsProvider>().clear();
+                      icon: "assets/icons/book.svg",
+                      name: AppLocalizations.of(context).inventory,
+                      onTap: () {
+                        if (tagsProvider.scannedTags.isEmpty) {
+                          openScannerSelectModal(
+                            context,
+                            (ScanType newType) async => await tagsProvider.setActiveScanType(newType),
+                          );
+                        } else {
+                          String snackBarText = "";
+
+                          if (tagsProvider.activeScanType == ScanType.RFID) {
+                            Navigator.pushNamed(context, Routes.rfidInventory);
+                            snackBarText = "Sesiunea de inventariere RFID a fost restabilită!";
+                          } else {
+                            Navigator.pushNamed(context, Routes.barcodeInventory);
+                            snackBarText = "Sesiunea de inventariere barcode a fost restabilită!";
+                          }
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(snackBarText),
+                              duration: const Duration(seconds: 1, milliseconds: 300),
+                            ),
+                          );
+                        }
                       },
-                    );
-                  },
-                ),
-              ],
+                    ),
+                    buildMultimediaItemContainer(
+                      context,
+                      icon: "assets/icons/upload.svg",
+                      name: AppLocalizations.of(context).uploadToTINREAD,
+                      onTap: () {},
+                    ),
+                    buildMultimediaItemContainer(
+                      context,
+                      icon: "assets/icons/download.svg",
+                      name: AppLocalizations.of(context).downloadFile,
+                      onTap: () {},
+                    ),
+                    buildMultimediaItemContainer(
+                      context,
+                      icon: "assets/icons/eraser.svg",
+                      name: AppLocalizations.of(context).reset,
+                      onTap: () {
+                        showConfirmDialog(
+                          context,
+                          title: "Atenție!",
+                          content: "Ești sigur că vrei să ștergi toate etichetele scanate?",
+                          onConfirm: () async {
+                            await tagsProvider.clear();
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

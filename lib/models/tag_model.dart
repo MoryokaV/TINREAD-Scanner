@@ -17,3 +17,5 @@ class Tag {
     };
   }
 }
+
+enum ScanType { RFID, Barcode }
