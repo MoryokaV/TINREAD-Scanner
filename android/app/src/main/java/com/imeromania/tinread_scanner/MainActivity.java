@@ -19,6 +19,19 @@ public class MainActivity extends FlutterActivity {
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
 
+        // shutdown rfid hardware on crash (not tested)
+        Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            if (rfidHandler != null) {
+                rfidHandler.shutdown();
+            }
+
+            if (defaultHandler != null) {
+                defaultHandler.uncaughtException(thread, throwable);
+            }
+        });
+
+
         MethodChannel rfidMethodChannel = new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), RFID_CHANNEL);
         rfidHandler = new RfidHandler(rfidMethodChannel);
 
