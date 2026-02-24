@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_scanner/models/tag_model.dart';
 import 'package:tinread_scanner/providers/connectivity_provider.dart';
+import 'package:tinread_scanner/providers/settings_provider.dart';
 import 'package:tinread_scanner/providers/tags_provider.dart';
 import 'package:tinread_scanner/services/rfid_service.dart';
 import 'package:tinread_scanner/utils/responsive.dart';
@@ -56,9 +57,7 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
 
   void autosave() {
     Timer.periodic(const Duration(seconds: AUTOSAVE_INTERLVAL), (_) async {
-      if (isScanning) {
-        await _tagsProvider.save(tags);
-      }
+      if (isScanning) await _tagsProvider.save(tags);
     });
   }
 
@@ -79,7 +78,9 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
       tags.addAll(newTags);
     });
 
-    audioPlayer.play(AssetSource("audio/beep.mp3"));
+    if (context.read<SettingsProvider>().settings.soundEnabled) {
+      audioPlayer.play(AssetSource("audio/beep.mp3"));
+    }
   }
 
   Future<void> toggleScan() async {
@@ -244,9 +245,7 @@ class _RfidInventoryViewState extends State<RfidInventoryView> with WidgetsBindi
                 ],
               ),
             ),
-            ItemsTable(
-              tags: tags,
-            ),
+            ItemsTable(tags: tags),
             BottomActionBar(
               isOnline: isOnline,
               isScanning: isScanning,

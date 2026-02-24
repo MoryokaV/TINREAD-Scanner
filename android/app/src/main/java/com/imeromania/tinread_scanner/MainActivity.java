@@ -14,6 +14,9 @@ public class MainActivity extends FlutterActivity {
     private static final String BARCODE_CHANNEL = "com.imeromania.tinread_scanner/barcode";
 
     private RfidHandler rfidHandler;
+    private BarcodeHandler barcodeHandler;
+    private boolean barcodeReceiverRegistered;
+
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -35,6 +38,9 @@ public class MainActivity extends FlutterActivity {
         MethodChannel rfidMethodChannel = new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), RFID_CHANNEL);
         rfidHandler = new RfidHandler(rfidMethodChannel);
 
+        MethodChannel barcodeMethodChannel = new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), BARCODE_CHANNEL);
+        barcodeHandler = new BarcodeHandler(this, barcodeMethodChannel);
+
         rfidMethodChannel.setMethodCallHandler(
             (call, result) -> {
                 switch (call.method) {
@@ -48,6 +54,16 @@ public class MainActivity extends FlutterActivity {
                 result.success(true);
             }
         );
+
+        barcodeMethodChannel.setMethodCallHandler(
+            (call, result) -> {
+                switch(call.method){
+                    default -> result.notImplemented();
+                }
+
+                result.success(true);
+            }
+        );
     }
 
     @Override
@@ -55,6 +71,25 @@ public class MainActivity extends FlutterActivity {
         super.onCreate(savedInstanceState);
 
         rfidHandler.initRFIDModule();
+
+        barcodeReceiverRegistered = true;
+        barcodeHandler.registerReceiver();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        barcodeReceiverRegistered = true;
+        barcodeHandler.registerReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        barcodeReceiverRegistered = false;
+        barcodeHandler.unregisterReceiver();
     }
 
     @Override
@@ -62,5 +97,8 @@ public class MainActivity extends FlutterActivity {
         super.onDestroy();
 
         rfidHandler.shutdown();
+        if(barcodeReceiverRegistered){
+            barcodeHandler.unregisterReceiver();
+        }
     }
 }

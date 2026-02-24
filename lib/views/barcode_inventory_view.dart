@@ -1,19 +1,18 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
+import 'package:tinread_scanner/models/tag_model.dart';
+import 'package:tinread_scanner/providers/connectivity_provider.dart';
 import 'package:tinread_scanner/providers/settings_provider.dart';
-import 'package:tinread_scanner/services/localstorage_service.dart';
+import 'package:tinread_scanner/providers/tags_provider.dart';
+import 'package:tinread_scanner/services/barcode_service.dart';
 import 'package:tinread_scanner/utils/responsive.dart';
 import 'package:tinread_scanner/utils/style.dart';
 import 'package:tinread_scanner/widgets/alert_dialog.dart';
-
-// TODO: autosave (check on crash)
+import 'package:tinread_scanner/widgets/separator_widget.dart';
 
 class BarcodeInventoryView extends StatefulWidget {
   const BarcodeInventoryView({super.key});
@@ -23,48 +22,17 @@ class BarcodeInventoryView extends StatefulWidget {
 }
 
 class _BarcodeInventoryViewState extends State<BarcodeInventoryView> with WidgetsBindingObserver {
-  bool flash = false;
-
   late final AudioPlayer audioPlayer = AudioPlayer();
-  late final MobileScannerController scannerController = MobileScannerController(
-    cameraResolution: Size(1080, 1920),
-    detectionSpeed: DetectionSpeed.normal,
-    facing: CameraFacing.back,
-    detectionTimeoutMs: 1000,
-    torchEnabled: flash,
-    autoStart: true,
-  );
 
-  late List<String> codes;
+  late final BarcodeService _barcodeService;
+  late final TagsProvider _tagsProvider;
+
+  late List<String> filters = [];
+  late String selectedFilter;
   int failAttempts = 0;
 
-  void _handleBarcode(BarcodeCapture result) async {
-    String newCode = result.barcodes.first.rawValue!;
-
-    if (!codes.contains(newCode)) {
-      failAttempts = 0;
-
-      setState(() {
-        codes.add(newCode);
-      });
-
-      if (context.read<SettingsProvider>().settings.soundEnabled) {
-        await audioPlayer.play(AssetSource("audio/beep.mp3"));
-      }
-    } else {
-      failAttempts += 1;
-
-      if (failAttempts >= 4) {
-        await audioPlayer.play(AssetSource("audio/error.mp3"));
-      }
-
-      if (failAttempts >= 8) {
-        failAttempts = 0;
-
-        if (mounted) showInfoDialog(context, "Atenție", "Codul $newCode se află deja în listă");
-      }
-    }
-  }
+  late Set<String> tids;
+  late List<Tag> tags;
 
   @override
   void initState() {
@@ -72,18 +40,50 @@ class _BarcodeInventoryViewState extends State<BarcodeInventoryView> with Widget
 
     WidgetsBinding.instance.addObserver(this);
 
-    codes = LocalStorage.getCurrentInventory() ?? [];
+    _barcodeService = BarcodeService();
+    _barcodeService.onTagReceived = onTagReceived;
+    _tagsProvider = context.read<TagsProvider>();
+
+    tags = _tagsProvider.scannedTags;
+    tids = tags.map((e) => e.tid).toSet();
   }
 
   @override
-  Future<void> dispose() async {
-    super.dispose();
-    await scannerController.dispose();
-    await LocalStorage.saveCurrentInventory(codes);
-    WidgetsBinding.instance.removeObserver(this);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    filters = [AppLocalizations.of(context).all, AppLocalizations.of(context).errors];
+    selectedFilter = filters[0];
   }
 
-  // save on app quit
+  void onTagReceived(String newTid) {
+    if (!mounted) return;
+
+    if (tids.add(newTid)) {
+      failAttempts = 0;
+
+      setState(() {
+        tags.add(Tag(tid: newTid));
+      });
+
+      if (context.read<SettingsProvider>().settings.soundEnabled) {
+        audioPlayer.play(AssetSource("audio/beep.mp3"));
+      }
+    } else {
+      failAttempts += 1;
+
+      if (failAttempts >= 2 && context.read<SettingsProvider>().settings.soundEnabled) {
+        audioPlayer.play(AssetSource("audio/error.mp3"));
+      }
+
+      if (failAttempts >= 4) {
+        failAttempts = 0;
+
+        if (mounted) showInfoDialog(context, "Atenție", "Codul $newTid se află deja în listă");
+      }
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
@@ -92,315 +92,405 @@ class _BarcodeInventoryViewState extends State<BarcodeInventoryView> with Widget
         state == AppLifecycleState.detached ||
         state == AppLifecycleState.inactive ||
         state == AppLifecycleState.hidden) {
-      await LocalStorage.saveCurrentInventory(codes);
+      await _tagsProvider.save(tags);
     }
   }
 
-  Widget buildBooksNumberText() {
-    String text = "${codes.length} cărți scanate";
+  @override
+  Future<void> dispose() async {
+    super.dispose();
 
-    if (codes.length == 1) {
-      text = "O carte scanată";
-    } else if (codes.length >= 20) {
-      text = "${codes.length} de cărți scanate";
-    }
+    await _tagsProvider.save(tags);
 
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.labelMedium,
-    );
+    _barcodeService.onTagReceived = null;
+
+    WidgetsBinding.instance.removeObserver(this);
   }
 
-  Future<void> exportCodesToTxt() async {
-    if (codes.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lista este goală! Scanează ceva mai întâi.")),
-      );
-      return;
-    }
+  Future<void> resetInventory() async {
+    setState(() {
+      tids = {};
+      tags = [];
+    });
 
-    if (await Permission.storage.request().isDenied) {
-      if (await Permission.manageExternalStorage.request().isDenied) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Permisiune refuzată! Nu pot salva fișierul.")),
-          );
-        }
-        return;
-      }
-    }
-
-    try {
-      Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
-
-      if (!await downloadsDirectory.exists()) {
-        downloadsDirectory = Directory('/storage/emulated/0/Documents');
-      }
-
-      final String fileName = "Inventar_${DateTime.now().millisecondsSinceEpoch}.txt";
-      final String filePath = "${downloadsDirectory.path}/$fileName";
-      final File file = File(filePath);
-
-      String fileContent = codes.join("\r\n");
-      await file.writeAsString(fileContent);
-
-      if (mounted) showInfoDialog(context, "Export", "Găsești fișierul la calea:\n\n $filePath");
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Eroare la export: $e")),
-        );
-      }
-    }
-  }
-
-  void resetList() {
-    showConfirmDialog(
-      context,
-      title: "Reset",
-      content: 'Ești sigur că vrei să ștergi lista de coduri?',
-      onConfirm: () {
-        setState(() {
-          codes.clear();
-        });
-      },
-    );
+    await _tagsProvider.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: kBackgroundColor,
-          elevation: 2,
-          titleSpacing: 0,
-          centerTitle: true,
-          title: Text(
-            AppLocalizations.of(context).barcodeInventory,
-            style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 22,
-            ),
-          ),
-          bottom: TabBar(
-            labelColor: kPrimaryColor,
-            indicatorColor: kPrimaryColor,
-            indicatorWeight: 2.5,
-            labelStyle: TextStyle(fontSize: 18),
-            onTap: (int newIndex) {
-              if (newIndex == 1) {
-                setState(() {
-                  flash = false;
-                });
-              }
-            },
-            tabs: [
-              Tab(
-                text: "Scanner",
-              ),
-              Tab(
-                text: "Listă",
-              ),
-            ],
-          ),
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.adaptive.arrow_back,
-              color: kForegroundColor,
-            ),
-          ),
-        ),
-        body: SafeArea(
-          bottom: false,
-          child: TabBarView(
-            children: [
-              Column(
-                children: [
-                  Expanded(
-                    child: MobileScanner(
-                      controller: scannerController,
-                      fit: BoxFit.cover,
-                      onDetect: _handleBarcode,
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(
-                      bottom: Responsive.safePaddingBottom > 0 ? Responsive.safePaddingBottom : 12,
-                      left: 24,
-                      right: 24,
-                      top: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [topShadow],
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                flash = !flash;
-                                scannerController.toggleTorch();
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              iconSize: 22,
-                            ),
-                            icon: Padding(
-                              padding: .only(right: 12),
-                              child: FaIcon(
-                                flash ? FontAwesomeIcons.solidLightbulb : FontAwesomeIcons.lightbulb,
-                                color: Colors.white,
-                              ),
-                            ),
+    final bool isOnline = context.select<ConnectivityProvider, bool>((c) => c.isOnline);
 
-                            label: Text(
-                              "Flash: ${flash ? "pornit" : "oprit"}",
-                              style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        Spacer(),
-                        FaIcon(
-                          FontAwesomeIcons.book,
-                          color: kPrimaryColor,
-                          size: 24,
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          codes.length.toString(),
-                          style: Theme.of(context).textTheme.labelLarge,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-                    child: Row(
-                      spacing: 12,
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.book,
-                          color: kPrimaryColor,
-                          size: 24,
-                        ),
-                        buildBooksNumberText(),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      padding: .zero,
-                      itemCount: codes.length,
-                      shrinkWrap: true,
-                      physics: ScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Container(
-                          padding: .symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: index % 2 == 0 ? lightGrey : kBackgroundColor,
-                          ),
-                          child: Row(
-                            children: [
-                              Text(codes[index]),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(
-                      bottom: Responsive.safePaddingBottom > 0 ? Responsive.safePaddingBottom : 12,
-                      left: 12,
-                      right: 12,
-                      top: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [topShadow],
-                    ),
-                    child: Row(
-                      spacing: 12,
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: resetList,
-                          style: ElevatedButton.styleFrom(
-                            elevation: 0,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            side: BorderSide(
-                              color: kDangerIconColor,
-                              width: 1,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
-                          icon: Padding(
-                            padding: .only(right: 12),
-                            child: FaIcon(
-                              FontAwesomeIcons.eraser,
-                              size: 20,
-                              color: kDangerIconColor,
-                            ),
-                          ),
-                          label: Text(
-                            "Reset",
-                            style: Theme.of(context).textTheme.labelLarge!.copyWith(color: kDangerTextColor),
-                          ),
-                        ),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: exportCodesToTxt,
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                            ),
-                            child: Text(
-                              "Export Fișier",
-                              style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        iconTheme: IconTheme.of(context).copyWith(color: kForegroundColor),
+        title: Text(
+          AppLocalizations.of(context).barcodeInventory,
+          style: Theme.of(context).textTheme.headlineLarge,
         ),
+      ),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [bottomShadowSm],
+              ),
+              child: Column(
+                spacing: 20,
+                children: [
+                  Row(
+                    mainAxisAlignment: .spaceBetween,
+                    children: [
+                      SizedBox(
+                        child: Row(
+                          spacing: 12,
+                          children: [
+                            Row(
+                              spacing: 8,
+                              children: [
+                                FaIcon(
+                                  FontAwesomeIcons.book,
+                                  color: kPrimaryColor,
+                                  size: 20,
+                                ),
+                                Text(
+                                  "253",
+                                  style: Theme.of(context).textTheme.labelMedium!.copyWith(color: kBlackColor),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              spacing: 8,
+                              children: [
+                                FaIcon(
+                                  FontAwesomeIcons.triangleExclamation,
+                                  color: kPrimaryColor,
+                                  size: 20,
+                                ),
+                                Text(
+                                  "12",
+                                  style: Theme.of(context).textTheme.labelMedium!.copyWith(color: kBlackColor),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        spacing: 8,
+                        children: [
+                          FaIcon(
+                            FontAwesomeIcons.solidClock,
+                            color: kPrimaryColor,
+                            size: 20,
+                          ),
+                          Text(
+                            "${AppLocalizations.of(context).time}: 01:45:32",
+                            style: Theme.of(context).textTheme.labelMedium!.copyWith(color: kBlackColor),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Row(
+                    spacing: 12,
+                    children: [
+                      Text(
+                        "${AppLocalizations.of(context).filter}:",
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      DropdownButton<String>(
+                        isExpanded: false,
+                        isDense: true,
+                        icon: Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: Icon(Icons.filter_list_rounded),
+                        ),
+                        underline: SizedBox(),
+                        iconSize: 22,
+                        padding: EdgeInsets.zero,
+                        value: selectedFilter,
+                        items: filters.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: Theme.of(context).textTheme.labelMedium!.copyWith(color: kForegroundColor),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedFilter = value ?? filters[0];
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            ItemsTable(tags: tags),
+            BottomActionBar(
+              isOnline: isOnline,
+              resetInventory: resetInventory,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ItemsTable extends StatefulWidget {
+  final List<Tag> tags;
+
+  const ItemsTable({
+    super.key,
+    required this.tags,
+  });
+
+  @override
+  State<ItemsTable> createState() => _ItemsTableState();
+}
+
+class _ItemsTableState extends State<ItemsTable> {
+  final tableCol1Width = Responsive.screenWidth / 4.5;
+  final tableCol2Width = Responsive.screenWidth / 2 - 12;
+  final tableCol3Width = Responsive.screenWidth / 3.6 - 12;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 12,
+              left: 12,
+              right: 12,
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: tableCol1Width,
+                  child: Text(AppLocalizations.of(context).number_short),
+                ),
+                SizedBox(
+                  width: tableCol2Width,
+                  child: Text(AppLocalizations.of(context).situation),
+                ),
+                SizedBox(
+                  width: tableCol3Width,
+                  child: Text(AppLocalizations.of(context).actions),
+                ),
+              ],
+            ),
+          ),
+          Separator(),
+          Expanded(
+            child: widget.tags.isNotEmpty
+                ? ListView.builder(
+                    padding: .zero,
+                    itemCount: widget.tags.length,
+                    shrinkWrap: true,
+                    physics: ScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      String tid = widget.tags[index].tid;
+                      String tidUniqueId = tid.substring(tid.length - 5, tid.length - 1);
+
+                      return Container(
+                        padding: .symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: index % 2 == 1 ? lightGrey : kBackgroundColor,
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: tableCol1Width,
+                              child: Text(tidUniqueId),
+                            ),
+                            SizedBox(
+                              width: tableCol2Width,
+                              child: Text("În inventariere"),
+                            ),
+                            SizedBox(
+                              width: tableCol3Width,
+                              child: Row(
+                                spacing: 12,
+                                children: [
+                                  IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    constraints: BoxConstraints(),
+                                    splashRadius: 1,
+                                    padding: .zero,
+                                    onPressed: () {
+                                      print("delete");
+                                    },
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.trashCan,
+                                      color: kPrimaryColor,
+                                      size: 18,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    constraints: BoxConstraints(),
+                                    splashRadius: 1,
+                                    padding: .zero,
+                                    onPressed: () {
+                                      print("compass");
+                                    },
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.compass,
+                                      color: kPrimaryColor,
+                                      size: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 15,
+                    children: [
+                      FaIcon(
+                        FontAwesomeIcons.circleInfo,
+                        color: kDisabledIconColor,
+                        size: 42,
+                      ),
+                      Text(
+                        AppLocalizations.of(context).emptyInventory,
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(color: kDisabledIconColor),
+                      ),
+                    ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class BottomActionBar extends StatefulWidget {
+  final bool isOnline;
+  final Future<void> Function() resetInventory;
+
+  const BottomActionBar({
+    super.key,
+    required this.isOnline,
+    required this.resetInventory,
+  });
+
+  @override
+  State<BottomActionBar> createState() => _BottomActionBarState();
+}
+
+class _BottomActionBarState extends State<BottomActionBar> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        bottom: Responsive.safePaddingBottom > 0 ? Responsive.safePaddingBottom : 12,
+        left: 12,
+        right: 12,
+        top: 12,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [topShadow],
+      ),
+      child: Row(
+        spacing: 24,
+        children: [
+          RichText(
+            text: TextSpan(
+              style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                color: widget.isOnline ? kSuccessTextColor : kDangerTextColor,
+                height: 1,
+              ),
+              children: [
+                TextSpan(
+                  text: " •  ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: widget.isOnline ? kSuccessIconColor : kDangerIconColor,
+                    fontSize: 24,
+                  ),
+                ),
+                TextSpan(
+                  text: "Status: ",
+                ),
+                TextSpan(
+                  text: widget.isOnline ? "online" : "offline",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    // color: kSuccessIconColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () {
+                showConfirmDialog(
+                  context,
+                  title: "Atenție!",
+                  content: "Ești sigur că vrei să ștergi toate etichetele scanate?",
+                  onConfirm: () async {
+                    await widget.resetInventory();
+                  },
+                );
+              },
+              style: OutlinedButton.styleFrom(
+                foregroundColor: kDangerIconColor.withAlpha(100),
+                elevation: 0,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                side: BorderSide(
+                  color: kDangerIconColor,
+                  width: 1,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+              ),
+              icon: Padding(
+                padding: .only(right: 12),
+                child: FaIcon(
+                  FontAwesomeIcons.eraser,
+                  size: 20,
+                  color: kDangerIconColor,
+                ),
+              ),
+              label: Text(
+                "Reset",
+                style: Theme.of(context).textTheme.labelLarge!.copyWith(color: kDangerTextColor),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
