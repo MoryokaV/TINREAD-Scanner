@@ -5,6 +5,7 @@ import 'package:tinread_scanner/l10n/generated/app_localizations.dart';
 import 'package:tinread_scanner/models/tag_model.dart';
 import 'package:tinread_scanner/providers/connectivity_provider.dart';
 import 'package:tinread_scanner/providers/tags_provider.dart';
+import 'package:tinread_scanner/services/export_file_service.dart';
 import 'package:tinread_scanner/utils/responsive.dart';
 import 'package:tinread_scanner/utils/router.dart';
 import 'package:tinread_scanner/utils/style.dart';
@@ -184,7 +185,9 @@ class _HomeViewState extends State<HomeView> {
                       context,
                       icon: "assets/icons/download.svg",
                       name: AppLocalizations.of(context).downloadFile,
-                      onTap: () {},
+                      onTap: () async {
+                        await ExportFileService.exportTagsToTxt(tagsProvider.scannedTags, context);
+                      },
                     ),
                     buildMultimediaItemContainer(
                       context,
