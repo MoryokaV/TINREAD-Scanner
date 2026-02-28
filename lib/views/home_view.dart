@@ -10,6 +10,7 @@ import 'package:tinread_scanner/utils/responsive.dart';
 import 'package:tinread_scanner/utils/router.dart';
 import 'package:tinread_scanner/utils/style.dart';
 import 'package:tinread_scanner/widgets/alert_dialog.dart';
+import 'package:tinread_scanner/widgets/select_inventory_modal.dart';
 import 'package:tinread_scanner/widgets/select_scanner_modal.dart';
 
 class HomeView extends StatefulWidget {
@@ -20,6 +21,29 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  void _openInventoryModal() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black38,
+      barrierLabel: "Inventory modal",
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return const SelectInventoryModal();
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeInOut,
+            reverseCurve: Curves.easeInOut,
+          ),
+          child: child,
+        );
+      },
+    );
+  }
+
   Widget buildMultimediaItemContainer(
     BuildContext context, {
     required String icon,
@@ -157,7 +181,7 @@ class _HomeViewState extends State<HomeView> {
                           );
                         } else {
                           String snackBarText = "";
-
+      
                           if (tagsProvider.activeScanType == ScanType.RFID) {
                             Navigator.pushNamed(context, Routes.rfidInventory);
                             snackBarText = "Sesiunea de inventariere RFID a fost restabilită!";
@@ -165,7 +189,7 @@ class _HomeViewState extends State<HomeView> {
                             Navigator.pushNamed(context, Routes.barcodeInventory);
                             snackBarText = "Sesiunea de inventariere barcode a fost restabilită!";
                           }
-
+      
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(snackBarText),
@@ -179,7 +203,9 @@ class _HomeViewState extends State<HomeView> {
                       context,
                       icon: "assets/icons/upload.svg",
                       name: AppLocalizations.of(context).uploadToTINREAD,
-                      onTap: () {},
+                      onTap: () {
+                        _openInventoryModal();
+                      },
                     ),
                     buildMultimediaItemContainer(
                       context,
